@@ -175,12 +175,12 @@ for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('inte
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {
     const defn = root.children[name];
-    output.write(expandProperty(defn, 'const '));
+    output.write(expandProperty(defn, 'export const '));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('method#')).sort()) {
     const defn = root.children[name];
-    output.write(expandMethod(defn, 'function '));
+    output.write(expandMethod(defn, 'export function '));
 }
 
 for (const className of Object.keys(root.children).filter((n) => n.startsWith('class#')).sort()) {
