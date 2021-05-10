@@ -1,0 +1,32 @@
+{
+  "name": "yatag",
+  "version": "1.0.0",
+  "description": "Yet Another Type Annotations Generator",
+  "main": "index.js",
+  "bin": {
+    "yatag": "./yatag.js"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmomtchev/yatag.git"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "generator",
+    "jsdoc"
+  ],
+  "author": "Momtchil Momtchev <momtchil@momtchev.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmomtchev/yatag/issues"
+  },
+  "homepage": "https://github.com/mmomtchev/yatag#readme",
+  "dependencies": {
+    "glob": "^7.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0"
+  }
+}
