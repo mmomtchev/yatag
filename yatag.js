@@ -141,7 +141,7 @@ for (const file of inputFiles) {
             continue;
         if (!targetClass)
             targetClass = currentClass;
-        if (newElement.context === 'class') {
+        if (newElement.context === 'class' || newElement.context === 'typedef') {
             targetClass = root;
         }
         if (!targetClass.children[`${newElement.context}#${newElement.name}`]) {
