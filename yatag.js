@@ -171,12 +171,14 @@ if (config.root && root.children[`class#${config.root}`]) {
 
 for (const typeName of Object.keys(root.children).filter((n) => n.startsWith('typedef#')).sort()) {
     const defn = root.children[typeName];
-    output.write(`export type ${defn.name} = ${defn.type}\n\n`);
+    const type = config.mangle ? config.mangle(defn.type) : defn.type;
+    output.write(`export type ${defn.name} = ${type}\n\n`);
 }
 
 for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('interface#')).sort()) {
     const defn = root.children[ifName];
-    output.write(`export interface ${defn.name} ${defn.type}\n\n`);
+    const type = config.mangle ? config.mangle(defn.type) : defn.type;
+    output.write(`export interface ${defn.name} ${type}\n\n`);
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {
