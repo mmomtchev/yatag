@@ -1,6 +1,6 @@
 {
   "name": "yatag",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Yet Another Type Annotations Generator",
   "main": "index.js",
   "bin": {

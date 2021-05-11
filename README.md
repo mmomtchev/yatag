@@ -8,6 +8,8 @@ It was created to generate the `index.d.ts` of the project `node-gdal-async` whi
 
 As opposed to the now built-in capability of the Typescript compilator, `yatag` solves a very simple problem in a very simple manner.
 
+`yatag` is completely language-agnostic as it doesn't parse the language at all - it parses only the jsdoc-compatible type annotations blocks.
+
 # Why another type generator?
 
 - Because ever since my childhood I always wanted to create at least one software package with a name starting with 'yet another'

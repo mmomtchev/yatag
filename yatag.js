@@ -68,6 +68,7 @@ for (const file of inputFiles) {
                     newElement.type = options.match(/\S+\s+(.*)/)[1];
                     newElement.name = name;
                     break;
+                // Both @for and @class create a class but only @class creates a class context
                 case 'class':
                     newElement.context = 'class';
                     newElement.name = name;
@@ -137,18 +138,23 @@ for (const file of inputFiles) {
                 throw e;
             }
         }
+        let key = `${newElement.context}#${newElement.name}`;
+        // method overloading
+        if (newElement.context === 'method')
+            key = `method#${newElement.name}#${Object.keys(newElement.children).join('#')}`;
         if (!newElement.context)
             continue;
         if (!targetClass)
             targetClass = currentClass;
-        if (newElement.context === 'class' || newElement.context === 'typedef') {
+        if (['class', 'typedef', 'interface'].includes(newElement.context)) {
             targetClass = root;
         }
-        if (!targetClass.children[`${newElement.context}#${newElement.name}`]) {
-            targetClass.children[`${newElement.context}#${newElement.name}`] = newElement;
+        if (!targetClass.children[key]) {
+            targetClass.children[key] = newElement;
         } else {
-            if (!targetClass.children[`${newElement.context}#${newElement.name}`].description)
-                targetClass.children[`${newElement.context}#${newElement.name}`].description = newElement.description;
+            // multiple ocurrences of the same @class/@for, get only the comment if there is any
+            if (!targetClass.children[key].description)
+                targetClass.children[key].description = newElement.description;
         }
         if (newElement.context === 'class') {
             currentClass = root.children[`class#${newElement.name}`];
