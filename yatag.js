@@ -25,7 +25,8 @@ function expandMethod(defn, prefix) {
     return output;
 }
 
-function expandProperty(defn, prefix) {
+function expandProperty(defn, prefixRO, prefixRW) {
+    const prefix = defn.readonly ? prefixRO : prefixRW;
     let output = `\n  ${defn.description}\n`;
     output += `  ${prefix || ''}${defn.name}`;
     output += expandParams(defn.children);
@@ -126,6 +127,7 @@ for (const file of inputFiles) {
                     }
                     break;
                 case 'readonly':
+                case 'readOnly':
                 case 'final':
                     newElement.readonly = true;
                     break;
@@ -183,7 +185,7 @@ for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('inte
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {
     const defn = root.children[name];
-    output.write(expandProperty(defn, 'export const '));
+    output.write(expandProperty(defn, 'export const ', 'export let '));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('method#')).sort()) {
@@ -203,7 +205,7 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
         output.write(`  constructor(${expandParams(klass.children)})\n`);
         for (const prop of Object.keys(klass.children).filter((n) => n.startsWith('property#'))) {
             const defn = klass.children[prop];
-            output.write(expandProperty(defn));
+            output.write(expandProperty(defn, 'readonly ', ''));
         }
         if (klass.children['iterator#'])
             output.write(`  [Symbol.iterator](): Iterator<${mangle(klass.children['iterator#'].type) || 'any'}>`);
