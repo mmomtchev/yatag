@@ -59,7 +59,7 @@ for (const file of inputFiles) {
             const command = tag[1];
             const options = tag[2];
             const name = options && mangle(options.match(/\S+/)[0]);
-            if (config.filter && options && !config.filter(options))
+            if (config.filter && options && name && !config.filter(name))
                 continue;
             verbose(file, currentClass.name, ':', command, options);
             try {
@@ -116,6 +116,8 @@ for (const file of inputFiles) {
                         const tokens = options.match(/\{(.+)\}\s+(\S+)\s*(.*)/);
                         const type = mangle(tokens[1]);
                         let name = mangle(tokens[2]);
+                        if (config.filter && options && name && !config.filter(name))
+                            continue;
                         let defValue = '';
                         const deftok = name.match(/\[([^=]+)(?:=(.+))?]/);
                         if (deftok) {
