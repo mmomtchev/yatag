@@ -166,11 +166,14 @@ for (const file of inputFiles) {
     }
 }
 
-if (config.root && root.children[`class#${config.root}`]) {
-    const rootClass = root.children[`class#${config.root}`];
-    root.description = rootClass.description;
-    root.children = Object.assign(root.children, rootClass.children);
-    delete root.children[`class#${config.root}`];
+if (config.root) {
+    if (root.children[`class#${config.root}`]) {
+        const rootClass = root.children[`class#${config.root}`];
+        root.description = rootClass.description;
+        root.children = Object.assign(root.children, rootClass.children);
+        delete root.children[`class#${config.root}`];
+    }
+    output.write(`export module ${config.root} {\n`);
 }
 
 for (const typeName of Object.keys(root.children).filter((n) => n.startsWith('typedef#')).sort()) {
@@ -217,4 +220,8 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
         }
         output.write('}\n\n');
     }
+}
+
+if (config.root) {
+    output.write(`}\nexport default ${config.root}\n`);
 }
