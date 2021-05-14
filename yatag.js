@@ -25,8 +25,7 @@ function expandMethod(defn, prefix) {
     return output;
 }
 
-function expandProperty(defn, prefixRO, prefixRW) {
-    const prefix = defn.readonly ? prefixRO : prefixRW;
+function expandProperty(defn, prefix) {
     let output = `\n  ${defn.description}\n`;
     output += `  ${prefix || ''}${defn.name}`;
     output += expandParams(defn.children);
@@ -138,7 +137,7 @@ for (const file of inputFiles) {
                 }
             } catch (e) {
                 console.error(comment[0]);
-                console.error(`Error parsing element ${command} ${options} in context ${newElement.context}:${newElement.name} : ${e}`);
+                console.error(`Error parsing element "${command}" "${options}" in context ${newElement.context}:${newElement.name} : ${e}`);
                 throw e;
             }
         }
@@ -146,6 +145,9 @@ for (const file of inputFiles) {
         // method overloading
         if (newElement.context === 'method')
             key = `method#${newElement.name}#${Object.keys(newElement.children).join('#')}`;
+        // property overloading (static vs non-static)
+        if (newElement.context === 'property')
+            key = `property#${newElement.name}#${newElement.static ? 'static' : 'nonstatic'}`;
         if (!newElement.context)
             continue;
         if (!targetClass)
@@ -190,7 +192,8 @@ for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('inte
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {
     const defn = root.children[name];
-    output.write(expandProperty(defn, 'export const ', 'export let '));
+    const prefix = defn.readonly ? 'export const ' : 'export let ';
+    output.write(expandProperty(defn, prefix));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('method#')).sort()) {
@@ -210,7 +213,9 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
         output.write(`  constructor(${expandParams(klass.children)})\n`);
         for (const prop of Object.keys(klass.children).filter((n) => n.startsWith('property#'))) {
             const defn = klass.children[prop];
-            output.write(expandProperty(defn, 'readonly ', ''));
+            let prefix = defn.static ? 'static ' : '';
+            prefix += defn.readonly ? 'readonly ' : '';
+            output.write(expandProperty(defn, prefix));
         }
         if (klass.children['iterator#'])
             output.write(`  [Symbol.iterator](): Iterator<${mangle(klass.children['iterator#'].type) || 'any'}>`);
