@@ -108,6 +108,7 @@ for (const file of inputFiles) {
                     newElement.name = name;
                     break;
                 case 'return':
+                case 'returns':
                     newElement.return = mangle(name.match(/\{(.+)\}/)[1]);
                     break;
                 case 'param':
