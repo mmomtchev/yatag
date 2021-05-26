@@ -223,3 +223,8 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
         output.write('}\n\n');
     }
 }
+
+if (config.footer) {
+    output.write(config.footer);
+    output.write('\n\n');
+}
