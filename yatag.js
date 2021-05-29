@@ -220,7 +220,8 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
         if (klass.children['iterator#'])
             output.write(` implements Iterable<${mangle(klass.children['iterator#'].type) || 'any'}>`);
         output.write(` {\n${klass.description}\n`);
-        output.write(`  constructor(${expandParams(klass.children)})\n`);
+        if (!config.augmentation)
+            output.write(`  constructor(${expandParams(klass.children)})\n`);
         for (const prop of Object.keys(klass.children).filter((n) => n.startsWith('property#'))) {
             const defn = klass.children[prop];
             let prefix = defn.static ? 'static ' : '';
