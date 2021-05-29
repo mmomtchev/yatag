@@ -33,6 +33,8 @@ module.exports = {
   root: "SuperDuperModule",
   mangle: (name) => name.match(/oldfashion/g, "modern"),
   filter: (name) => !name.match(/__hidden_sys_internals/g),
+  header: 'import base from \'base\'',
+  footer: 'export = myDefaultExport'
 };
 ```
 

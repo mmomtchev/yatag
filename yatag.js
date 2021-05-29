@@ -46,6 +46,15 @@ for (const pattern of config.include) {
     inputFiles = inputFiles.concat(glob.sync(pattern));
 }
 
+if (config.header) {
+    output.write(config.header);
+    output.write('\n\n');
+}
+
+if (config.augmentation) {
+    output.write(`declare module '${config.augmentation}' {\n\n`);
+}
+
 for (const file of inputFiles) {
     verbose('-- processing', file);
     const code = fs.readFileSync(file, 'utf-8');
@@ -202,7 +211,10 @@ for (const name of Object.keys(root.children).filter((n) => n.startsWith('method
 for (const className of Object.keys(root.children).filter((n) => n.startsWith('class#')).sort()) {
     const klass = root.children[className];
     if (klass.context === 'class') {
-        output.write(`export class ${klass.name}`);
+        if (!config.augmentation)
+            output.write(`export class ${klass.name}`);
+        else
+            output.write(`export interface ${klass.name}`);
         if (klass.extends)
             output.write(` extends ${klass.extends}`);
         if (klass.children['iterator#'])
@@ -223,6 +235,10 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
         }
         output.write('}\n\n');
     }
+}
+
+if (config.augmentation) {
+    output.write('}\n');
 }
 
 if (config.footer) {
