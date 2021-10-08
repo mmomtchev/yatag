@@ -33,6 +33,21 @@ function expandProperty(defn, prefix) {
     return output;
 }
 
+function expandType(defn, declaration) {
+    let output = declaration;
+    if (defn.description) output += defn.description;
+    if (Object.keys(defn.children).length > 0) {
+        output += '{\n';
+        for (const propId of Object.keys(defn.children).filter((n) => n.startsWith('property#'))) {
+            const prop = defn.children[propId];
+            output += `\t${prop.name}${prop.defValue ? '?' : ''}: ${prop.type};\n`;
+        }
+        output += '}\n';
+    }
+    output += '\n';
+    return output;
+}
+
 const output = fs.createWriteStream(config.output);
 
 let verbose = () => undefined;
@@ -66,16 +81,31 @@ for (const file of inputFiles) {
         for (const tag of comment[0].matchAll(/@(\S+)(?:[ \t]+(.*))?/g)) {
             const command = tag[1];
             const options = tag[2];
-            const name = options && mangle(options.match(/\S+/)[0]);
-            if (config.filter && options && name && !config.filter(name))
-                continue;
+            let groups, type, name;
+            let defValue = false;
+            if (options) {
+                groups = options.match(/(\{(?<type>[^}]+)\})?\s*?((?<name>[^\s{}]+)\s*((?<description>.*))?)?$/).groups;
+                if (config.filter && options && groups.name && !config.filter(groups.name))
+                    continue;
+                name = mangle(groups.name);
+                type = groups.type ? mangle(groups.type) : undefined;
+
+                if (name) {
+                    const deftok = name.match(/\[([^=]+)(?:=(.+))?]/);
+                    if (deftok) {
+                        name = deftok[1];
+                        defValue = ` = ${deftok[2] || 'undefined'}`;
+                    }
+                }
+            }
             verbose(file, currentClass.name, ':', command, options);
             try {
                 switch (command) {
                 case 'interface':
                     newElement.context = 'interface';
-                    newElement.type = options.match(/\S+\s+(.*)/)[1];
+                    newElement.type = type;
                     newElement.name = name;
+                    newElement.description = groups.description;
                     break;
                 // Both @for and @class create a class but only @class creates a class context
                 case 'class':
@@ -105,37 +135,28 @@ for (const file of inputFiles) {
                     break;
                 case 'property':
                 case 'attribute':
-                    newElement.context = 'property';
-                    newElement.name = name;
+                    if (newElement.context) {
+                        newElement.children[`property#${name}`] = { context: 'property', type, name, description: groups.description, defValue };
+                    } else {
+                        newElement.context = 'property';
+                        newElement.name = name;
+                    }
                     break;
                 case 'type':
-                    newElement.type = mangle(name.match(/\{(.+)\}/)[1]);
+                    newElement.type = type;
                     break;
                 case 'typedef':
                     newElement.context = 'typedef';
-                    newElement.type = options.match(/\S+\s+(.*)/)[1];
-                    newElement.name = name;
+                    newElement.type = groups.type;
+                    newElement.name = groups.name;
+                    newElement.description = groups.description;
                     break;
                 case 'return':
                 case 'returns':
-                    newElement.return = mangle(name.match(/\{(.+)\}/)[1]);
+                    newElement.return = type;
                     break;
                 case 'param':
-                    {
-                        const tokens = options.match(/\{(.+)\}\s+(\S+)\s*(.*)/);
-                        const type = mangle(tokens[1]);
-                        let name = mangle(tokens[2]);
-                        if (config.filter && options && name && !config.filter(name))
-                            continue;
-                        let defValue = '';
-                        const deftok = name.match(/\[([^=]+)(?:=(.+))?]/);
-                        if (deftok) {
-                            name = deftok[1];
-                            defValue = ` = ${deftok[2] || 'undefined'}`;
-                        }
-                        const description = tokens[3];
-                        newElement.children[`param#${name}`] = { context: 'param', type, name, description, defValue };
-                    }
+                    newElement.children[`param#${name}`] = { context: 'param', type, name, description: groups.description, defValue };
                     break;
                 case 'readonly':
                 case 'readOnly':
@@ -148,7 +169,7 @@ for (const file of inputFiles) {
             } catch (e) {
                 console.error(comment[0]);
                 console.error(`Error parsing element "${command}" "${options}" in context ${newElement.context}:${newElement.name} : ${e}`);
-                throw e;
+                process.exit(1);
             }
         }
         let key = `${newElement.context}#${newElement.name}`;
@@ -187,14 +208,12 @@ if (config.root && root.children[`class#${config.root}`]) {
 
 for (const typeName of Object.keys(root.children).filter((n) => n.startsWith('typedef#')).sort()) {
     const defn = root.children[typeName];
-    const type = mangle(defn.type);
-    output.write(`export type ${defn.name} = ${type}\n\n`);
+    output.write(expandType(defn, `export type ${defn.name} = `));
 }
 
 for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('interface#')).sort()) {
     const defn = root.children[ifName];
-    const type = mangle(defn.type);
-    output.write(`export interface ${defn.name} ${type}\n\n`);
+    output.write(expandType(defn, `export interface ${defn.name} `));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {

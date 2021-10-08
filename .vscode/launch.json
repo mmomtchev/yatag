@@ -7,13 +7,25 @@
         {
             "type": "pwa-node",
             "request": "launch",
-            "name": "Launch yatag (JS)",
-            "cwd": "${workspaceFolder}/../node-gdal-async-master/",
+            "name": "Launch node-gdal-async",
+            "cwd": "${workspaceFolder}/test/node-gdal-async/",
+            "args": [ "-v" ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/yatag.js"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Launch ndarray-gdal",
+            "cwd": "${workspaceFolder}/test/ndarray-gdal/",
             "args": [ "-v" ],
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/yatag.js"
         }
+
     ]
 }

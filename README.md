@@ -1,12 +1,16 @@
 # yatag
 
+## **[YMMV]**
+
+***This project is still not ready for general use. I use it to create TypeScript type annotations for most of my JS and especially my combined JS/C++ projects. I usually add the features I need at every new project. Maybe one day it will become a real generic tool.***
+
 # Yet Another Tag Annotations Generator
 
 yatag is a tool for generating TypeScript `index.d.ts` from jsdoc-compatible type annotations.
 
 It was created to generate the `index.d.ts` of the project `node-gdal-async` which is a native Node.js addon with both JS and C++ code. It is tested with `yuidoc` but should also support other jsdoc-compatible annotations.
 
-As opposed to the now built-in capability of the Typescript compilator, `yatag` solves a very simple problem in a very simple manner.
+As opposed to the now built-in capability of the Typescript compiler, `yatag` solves a very simple problem in a very simple manner.
 
 `yatag` is completely language-agnostic as it doesn't parse the language at all - it parses only the jsdoc-compatible type annotations blocks.
 

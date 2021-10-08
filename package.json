@@ -6,7 +6,9 @@
   "bin": {
     "yatag": "./yatag.js"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "bash test.sh"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mmomtchev/yatag.git"
