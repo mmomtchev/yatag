@@ -1,5 +1,10 @@
 # yatag
 
+
+[![License: ISC](https://img.shields.io/github/license/mmomtchev/yatag)](https://github.com/mmomtchev/yatag/blob/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/yatag)](https://www.npmjs.com/package/yatag)
+[![Node.js CI](https://github.com/mmomtchev/yatag/workflows/Node.js%20CI/badge.svg)](https://github.com/mmomtchev/yatag/actions?query=workflow%3A%22Node.js+CI%22)
+
 ## **[YMMV]**
 
 ***This project is still not ready for general use. I use it to create TypeScript type annotations for most of my JS and especially my combined JS/C++ projects. I usually add the features I need at every new project. Maybe one day it will become a real generic tool.***
