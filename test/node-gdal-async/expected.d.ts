@@ -37,6 +37,7 @@ export type PolygonizeOptions = {
 }
 
 export type ProgressCb = ( complete: number, msg: string ) => void
+
 export type ProgressOptions = {
 	progress_cb: ProgressCb;
 }
@@ -83,6 +84,7 @@ export type SieveOptions = {
 }
 
 export type TypedArray = Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array
+
 export type WarpOptions = {
 	src: Dataset;
 	s_srs: SpatialReference;
@@ -105,8 +107,11 @@ export type WriteOptions = {
 }
 
 export type callback<T> = (Error, T) => void
+
 export type forEachCb<T> = (obj: T, idx: number) => boolean|void
+
 export type mapCb<T,U> = (obj: T, index: number) => U
+
 export type stats = {
 	min: number;
 	max: number;
@@ -120,6 +125,7 @@ export type units = {
 }
 
 export interface fieldValue { key: string, value: any }
+
 export interface xyz {
 	x: number;
 	y: number;

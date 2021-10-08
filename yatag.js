@@ -42,9 +42,9 @@ function expandType(defn, declaration) {
             const prop = defn.children[propId];
             output += `\t${prop.name}${prop.defValue ? '?' : ''}: ${prop.type};\n`;
         }
-        output += '}\n';
+        output += '}';
     }
-    output += '\n';
+    output += '\n\n';
     return output;
 }
 
