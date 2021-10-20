@@ -237,10 +237,9 @@ GDAL_ASYNCABLE_DEFINE(Driver::create) {
  * @method createCopy
  * @param {string} filename
  * @param {gdal.Dataset} src
- * @param {string[]|object} [options=null] An array or object containing
- * driver-specific dataset creation options
- * @param {boolean} [strict=false] strict mode
+ * @param {string[]|object} [options=null] An array or object containing driver-specific dataset creation options
  * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}
+ * @param {boolean} [strict=false] strict mode
  * @return {gdal.Dataset}
  */
 
@@ -251,10 +250,9 @@ GDAL_ASYNCABLE_DEFINE(Driver::create) {
  * @method createCopyAsync
  * @param {string} filename
  * @param {gdal.Dataset} src
- * @param {string[]|object} [options=null] An array or object containing
- * driver-specific dataset creation options
+ * @param {string[]|object} [options=null] An array or object containing driver-specific dataset creation options
+ * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}. When specified in Promise mode, strict must also be present or progress_cb will be interpreted as a result callback.
  * @param {boolean} [strict=false] strict mode
- * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}
  * @param {callback<gdal.Dataset>} [callback=undefined] {{{cb}}}
  * @return {Promise<gdal.Dataset>}
  */
@@ -291,10 +289,10 @@ GDAL_ASYNCABLE_DEFINE(Driver::createCopy) {
   }
 
   bool strict = false;
-  NODE_ARG_BOOL_OPT(3, "strict", strict);
+  NODE_ARG_BOOL_OPT(4, "strict", strict);
 
   Nan::Callback *progress_cb = nullptr;
-  NODE_ARG_CB_OPT(4, "progress_cb", progress_cb);
+  NODE_ARG_CB_OPT(3, "progress_cb", progress_cb);
 
   GDALDriver *raw = driver->getGDALDriver();
   GDALDataset *raw_ds = src_dataset->get();

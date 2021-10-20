@@ -125,6 +125,9 @@ for (const file of inputFiles) {
                     if (name === 'Symbol.iterator') {
                         newElement.context = 'iterator';
                         newElement.name = '';
+                    } else if (name === 'Symbol.asyncIterator') {
+                        newElement.context = 'asyncIterator';
+                        newElement.name = '';
                     } else {
                         newElement.context = 'method';
                         newElement.name = name;
@@ -236,8 +239,14 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
             output.write(`export interface ${klass.name}`);
         if (klass.extends)
             output.write(` extends ${klass.extends}`);
-        if (klass.children['iterator#'])
-            output.write(` implements Iterable<${mangle(klass.children['iterator#'].type) || 'any'}>`);
+        if (klass.children['iterator#'] || klass.children['asyncIterator#']) {
+            const iterables = [];
+            if (klass.children['iterator#'])
+                iterables.push(`Iterable<${mangle(klass.children['iterator#'].type) || 'any'}>`);
+            if (klass.children['asyncIterator#'])
+                iterables.push(`AsyncIterable<${mangle(klass.children['asyncIterator#'].type) || 'any'}>`);
+            output.write(` implements ${iterables.join(', ')}`);
+        }
         output.write(` {\n${klass.description}\n`);
         if (!config.augmentation)
             output.write(`  constructor(${expandParams(klass.children)})\n`);
@@ -248,7 +257,9 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
             output.write(expandProperty(defn, prefix));
         }
         if (klass.children['iterator#'])
-            output.write(`  [Symbol.iterator](): Iterator<${mangle(klass.children['iterator#'].type) || 'any'}>`);
+            output.write(`  [Symbol.iterator](): Iterator<${mangle(klass.children['iterator#'].type) || 'any'}>\n`);
+        if (klass.children['asyncIterator#'])
+            output.write(`  [Symbol.asyncIterator](): AsyncIterator<${mangle(klass.children['asyncIterator#'].type) || 'any'}>\n`);
         for (const method of Object.keys(klass.children).filter((n) => n.startsWith('method#'))) {
             const defn = klass.children[method];
             output.write(expandMethod(defn, defn.static ? 'static ' : undefined));

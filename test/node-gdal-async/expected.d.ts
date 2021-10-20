@@ -635,7 +635,7 @@ export interface xyz {
   /**
    * String extended type for MDArrays (GDAL >= 3.1)
    * @final
-   * @property gdal.GEDTC_String 
+   * @property gdal.GEDTC_String
    * @type {string}
    */
   export const GEDTC_String: string
@@ -1347,6 +1347,42 @@ export interface xyz {
   export function fillNodataAsync(options: FillOptions, callback?: callback<void>): Promise<void>
 
   /**
+ * Library version of gdalinfo.
+ *
+ * @example
+ * const ds = gdal.open('input.tif')
+ * const output = gdal.info('/vsimem/temp.tif')
+ *
+ * @throws Error
+ * @method info
+ * @for gdal
+ * @static
+ * @param {gdal.Dataset} dataset
+ * @param {string[]} array of CLI options for gdalinfo
+ * @return {string}
+ */
+  export function info(dataset: Dataset, array: string[]): string
+
+  /**
+ * Library version of gdalinfo.
+ * {{{async}}}
+ *
+ * @example
+ * const ds = gdal.open('input.tif')
+ * const output = gdal.info('/vsimem/temp.tif')
+ * @throws Error
+ *
+ * @method infoAsync
+ * @for gdal
+ * @static
+ * @param {gdal.Dataset} dataset
+ * @param {string[]} array of CLI options for gdalinfo
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<string>}
+ */
+  export function infoAsync(dataset: Dataset, array: string[], callback?: callback<void>): Promise<string>
+
+  /**
  * Creates or opens a dataset. Dataset should be explicitly closed with `dataset.close()` method if opened in `"w"` mode to flush any changes. Otherwise, datasets are closed when (and if) node decides to garbage collect them.
  *
  * @example
@@ -1497,7 +1533,7 @@ export interface xyz {
  * @param {number} [options.memoryLimit]
  * @param {number} [options.maxError]
  * @param {boolean} [options.multi]
- * @param {string[]|object} [options.options] Warp options (see: [reference](http://www.gdal.org/structGDALWarpOptions.html#a0ed77f9917bb96c7a9aabd73d4d06e08))
+ * @param {string[]|object} [options.options] Warp options (see: [reference](https://gdal.org/doxygen/structGDALWarpOptions.html))
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  */
   export function reprojectImage(options: ReprojectOptions): void
@@ -1526,7 +1562,7 @@ export interface xyz {
  * @param {number} [options.memoryLimit]
  * @param {number} [options.maxError]
  * @param {boolean} [options.multi]
- * @param {string[]|object} [options.options] Warp options (see:[reference](http://www.gdal.org/structGDALWarpOptions.html#a0ed77f9917bb96c7a9aabd73d4d06e08))
+ * @param {string[]|object} [options.options] Warp options (see:[reference](https://gdal.org/doxygen/structGDALWarpOptions.html)
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<void>}
@@ -1618,6 +1654,82 @@ export interface xyz {
   export function suggestedWarpOutputAsync(options: WarpOptions, callback?: callback<WarpOutput>): Promise<WarpOutput>
 
   /**
+ * Library version of gdal_translate.
+ *
+ * @example
+ * const ds = gdal.open('input.tif')
+ * const out = gdal.translate('/vsimem/temp.tif', ds, [ '-b', '1' ])
+ *
+ * @throws Error
+ * @method translate
+ * @for gdal
+ * @static
+ * @param {string} destination destination filename
+ * @param {gdal.Dataset} source source dataset
+ * @param {string[]} array of CLI options for gdal_translate
+ * @return {gdal.Dataset}
+ */
+  export function translate(destination: string, source: Dataset, array: string[]): Dataset
+
+  /**
+ * Library version of gdal_translate.
+ * {{{async}}}
+ *
+ * @example
+ * const ds = gdal.open('input.tif')
+ * const out = gdal.translate('/vsimem/temp.tif', ds, [ '-b', '1' ])
+ * @throws Error
+ *
+ * @method translateAsync
+ * @for gdal
+ * @static
+ * @param {string} destination destination filename
+ * @param {gdal.Dataset} source source dataset
+ * @param {string[]} array of CLI options for gdal_translate
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.Dataset>}
+ */
+  export function translateAsync(destination: string, source: Dataset, array: string[], callback?: callback<void>): Promise<Dataset>
+
+  /**
+ * Library version of ogr2ogr.
+ *
+ * @example
+ * const ds = gdal.open('input.geojson')
+ * const out = gdal.vectorTranslate('/vsimem/temp.gpkg', [ '-of', 'GPKG' ], ds)
+ *
+ * @throws Error
+ * @method vectorTranslate
+ * @for gdal
+ * @static
+ * @param {string|gdal.Dataset} destination destination
+ * @param {gdal.Dataset} source source dataset
+ * @param {string[]} array of CLI options for ogr2ogr
+ * @return {gdal.Dataset}
+ */
+  export function vectorTranslate(destination: string|Dataset, source: Dataset, array: string[]): Dataset
+
+  /**
+ * Library version of ogr2ogr.
+ * {{{async}}}
+ *
+ * @example
+ * const ds = gdal.open('input.geojson')
+ * const out = gdal.vectorTranslate('/vsimem/temp.gpkg', [ '-of', 'GPKG' ], ds)
+ * @throws Error
+ *
+ * @method vectorTranslateAsync
+ * @for gdal
+ * @static
+ * @param {string|gdal.Dataset} destination destination
+ * @param {gdal.Dataset} source source dataset
+ * @param {string[]} array of CLI options for ogr2ogr
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.Dataset>}
+ */
+  export function vectorTranslateAsync(destination: string|Dataset, source: Dataset, array: string[], callback?: callback<void>): Promise<Dataset>
+
+  /**
    * Displays extra debugging information from GDAL.
    *
    * @for gdal
@@ -1625,7 +1737,7 @@ export interface xyz {
    * @method verbose
    */
   export function verbose(): void
-export class ArrayAttributes implements Iterable<Attribute> {
+export class ArrayAttributes implements Iterable<Attribute>, AsyncIterable<Attribute> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Array{{/crossLink}}'s
  * descendant attributes.
@@ -1650,6 +1762,8 @@ export class ArrayAttributes implements Iterable<Attribute> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<Attribute>
+  [Symbol.asyncIterator](): AsyncIterator<Attribute>
+
   /**
  * Returns the attribute with the given name/index.
  *
@@ -1695,21 +1809,21 @@ export class ArrayAttributes implements Iterable<Attribute> {
  *
  * @example
  * ```
- * group.attributes.forEach(function(array, i) { ... });```
+ * array.attributes.forEach(function(array, i) { ... });```
  *
  * @for gdal.ArrayAttributes
  * @method forEach
- * @param {forEachCb<gdal.Dimension>} callback The callback to be called with each {{#crossLink "Dimension"}}Dimension{{/crossLink}}
+ * @param {forEachCb<gdal.Attribute>} callback The callback to be called with each {{#crossLink "Attribute"}}Attribute{{/crossLink}}
  */
-  forEach(callback: forEachCb<Dimension>): void
+  forEach(callback: forEachCb<Attribute>): void
 
   /**
- * Iterates through all attributes using a callback function and builds
+ * Iterates through attributes arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = group.attributes.map(function(array, i) {
+ * var result = array.attributes.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -1721,7 +1835,7 @@ export class ArrayAttributes implements Iterable<Attribute> {
   map<U>(callback: mapCb<Attribute,U>): U[]
 }
 
-export class ArrayDimensions implements Iterable<Dimension> {
+export class ArrayDimensions implements Iterable<Dimension>, AsyncIterable<Dimension> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Group{{/crossLink}}'s
  * descendant dimensions.
@@ -1749,6 +1863,8 @@ export class ArrayDimensions implements Iterable<Dimension> {
  */
   readonly ds: Group
   [Symbol.iterator](): Iterator<Dimension>
+  [Symbol.asyncIterator](): AsyncIterator<Dimension>
+
   /**
  * Returns the array with the given name/index.
  *
@@ -1790,12 +1906,25 @@ export class ArrayDimensions implements Iterable<Dimension> {
   countAsync(callback?: callback<number>): Promise<number>
 
   /**
- * Iterates through all dimensions using a callback function and builds
+ * Iterates through all dimensions using a callback function.
+ *
+ * @example
+ * ```
+ * array.dimensions.forEach(function(array, i) { ... });```
+ *
+ * @for gdal.ArrayDimensions
+ * @method forEach
+ * @param {forEachCb<gdal.Dimension>} callback The callback to be called with each {{#crossLink "Dimension"}}Dimension{{/crossLink}}
+ */
+  forEach(callback: forEachCb<Dimension>): void
+
+  /**
+ * Iterates through dimensions arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = group.dimensions.map(function(array, i) {
+ * var result = array.dimensions.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -1874,7 +2003,7 @@ export class CompoundCurve extends Geometry {
   curves: CompoundCurveCurves
 }
 
-export class CompoundCurveCurves implements Iterable<SimpleCurve> {
+export class CompoundCurveCurves implements Iterable<SimpleCurve>, AsyncIterable<SimpleCurve> {
 /**
  * A collection of connected curves, used by {{#crossLink
  * "gdal.CompoundCurve"}}gdal.CompoundCurve{{/crossLink}}.
@@ -1883,6 +2012,8 @@ export class CompoundCurveCurves implements Iterable<SimpleCurve> {
  */
   constructor()
   [Symbol.iterator](): Iterator<SimpleCurve>
+  [Symbol.asyncIterator](): AsyncIterator<SimpleCurve>
+
   /**
  * Returns the number of curves that exist in the collection.
  *
@@ -1930,34 +2061,43 @@ export class CompoundCurveCurves implements Iterable<SimpleCurve> {
   add(curves: SimpleCurve|SimpleCurve[]): void
 
   /**
-   * Iterates through all curves using a callback function.
-   *
-   * @example
-   * ```
-   * compoundCurve.curves.forEach(function(curve, i) { ... });```
-   *
-   * @for gdal.CompoundCurveCurves
-   * @method forEach
-   * @param {forEachCb<gdal.SimpleCurve>} callback The callback to be called with each {{#crossLink "SimpleCurve"}}SimpleCurve{{/crossLink}}
-   */
+ * Iterates through all curves using a callback function.
+ *
+ * @example
+ * ```
+ * compoundCurves.curves.forEach(function(array, i) { ... });```
+ *
+ * @for gdal.CompoundCurveCurves
+ * @method forEach
+ * @param {forEachCb<gdal.SimpleCurve>} callback The callback to be called with each {{#crossLink "SimpleCurve"}}SimpleCurve{{/crossLink}}
+ */
   forEach(callback: forEachCb<SimpleCurve>): void
 
   /**
-   * Iterates through all curves using a callback function and builds
-   * an array of the returned values.
-   *
-   * @example
-   * ```
-   * var result = compoundCurves.curves.map(function(curve, i) {
-   *     return value;
-   * });```
-   *
-   * @for gdal.CompoundCurveCurves
-   * @method map<U>
-   * @param {mapCb<gdal.SimpleCurve,U>} callback The callback to be called with each {{#crossLink "SimpleCurve"}}SimpleCurve{{/crossLink}}
-   * @return {U[]}
-   */
+ * Iterates through curves arrays using a callback function and builds
+ * an array of the returned values.
+ *
+ * @example
+ * ```
+ * var result = compoundCurves.curves.map(function(array, i) {
+ *     return value;
+ * });```
+ *
+ * @for gdal.CompoundCurveCurves
+ * @method map<U>
+ * @param {mapCb<gdal.SimpleCurve,U>} callback The callback to be called with each {{#crossLink "SimpleCurve"}}SimpleCurve{{/crossLink}}
+ * @return {U[]}
+ */
   map<U>(callback: mapCb<SimpleCurve,U>): U[]
+
+  /**
+ * Outputs all curves as a regular javascript array.
+ *
+ * @for gdal.CompoundCurveCurves
+ * @method toArray
+ * @return {gdal.SimpleCurve[]} List of {{#crossLink "SimpleCurve"}}SimpleCurve{{/crossLink}} instances.
+ */
+  toArray(): SimpleCurve[]
 }
 
 export class CoordinateTransformation {
@@ -2322,7 +2462,7 @@ export class Dataset {
   buildOverviewsAsync(resampling: string, overviews: number[], bands?: number[], options?: ProgressOptions, callback?: callback<void>): Promise<void>
 }
 
-export class DatasetBands implements Iterable<RasterBand> {
+export class DatasetBands implements Iterable<RasterBand>, AsyncIterable<RasterBand> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Dataset"}}Dataset{{/crossLink}}'s
  * raster bands.
@@ -2343,6 +2483,8 @@ export class DatasetBands implements Iterable<RasterBand> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<RasterBand>
+  [Symbol.asyncIterator](): AsyncIterator<RasterBand>
+
   /**
  * Returns the band with the given ID.
  *
@@ -2411,6 +2553,23 @@ export class DatasetBands implements Iterable<RasterBand> {
   countAsync(callback?: callback<number>): Promise<number>
 
   /**
+ * Iterates through raster bands arrays using a callback function and builds
+ * an array of the returned values.
+ *
+ * @example
+ * ```
+ * var result = dataset.bands.map(function(array, i) {
+ *     return value;
+ * });```
+ *
+ * @for gdal.DatasetBands
+ * @method map<U>
+ * @param {mapCb<gdal.RasterBand,U>} callback The callback to be called with each {{#crossLink "RasterBand"}}RasterBand{{/crossLink}}
+ * @return {U[]}
+ */
+  map<U>(callback: mapCb<RasterBand,U>): U[]
+
+  /**
  * Returns a {{#crossLink "Envelope"}}gdal.Envelope{{/crossLink}} object for the raster bands
  *
  * @example
@@ -2437,26 +2596,9 @@ export class DatasetBands implements Iterable<RasterBand> {
  * @param {forEachCb<gdal.RasterBand>} callback The callback to be called with each {{#crossLink "RasterBand"}}RasterBand{{/crossLink}}
  */
   forEach(callback: forEachCb<RasterBand>): void
-
-  /**
- * Iterates through all bands using a callback function and builds
- * an array of the returned values.
- *
- * @example
- * ```
- * var result = dataset.bands.map(function(band, i) {
- *     return value;
- * });```
- *
- * @for gdal.DatasetBands
- * @method map<U>
- * @param {mapCb<gdal.RasterBand,U>} callback The callback to be called with each {{#crossLink "RasterBand"}}RasterBand{{/crossLink}}
- * @return {U[]}
- */
-  map<U>(callback: mapCb<RasterBand,U>): U[]
 }
 
-export class DatasetLayers implements Iterable<Layer> {
+export class DatasetLayers implements Iterable<Layer>, AsyncIterable<Layer> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Dataset"}}Dataset{{/crossLink}}'s
  * vector layers.
@@ -2477,6 +2619,8 @@ export class DatasetLayers implements Iterable<Layer> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<Layer>
+  [Symbol.asyncIterator](): AsyncIterator<Layer>
+
   /**
  * Returns the layer with the given name or identifier.
  *
@@ -2610,7 +2754,7 @@ export class DatasetLayers implements Iterable<Layer> {
  *
  * @example
  * ```
- * dataset.layers.forEach(function(layer, i) { ... });```
+ * dataset.layers.forEach(function(array, i) { ... });```
  *
  * @for gdal.DatasetLayers
  * @method forEach
@@ -2619,12 +2763,12 @@ export class DatasetLayers implements Iterable<Layer> {
   forEach(callback: forEachCb<Layer>): void
 
   /**
- * Iterates through all layers using a callback function and builds
+ * Iterates through layers arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = dataset.layers.map(function(field, i) {
+ * var result = dataset.layers.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -2751,13 +2895,12 @@ export class Driver {
  * @method createCopy
  * @param {string} filename
  * @param {gdal.Dataset} src
- * @param {string[]|object} [options=null] An array or object containing
- * driver-specific dataset creation options
- * @param {boolean} [strict=false] strict mode
+ * @param {string[]|object} [options=null] An array or object containing driver-specific dataset creation options
  * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}
+ * @param {boolean} [strict=false] strict mode
  * @return {gdal.Dataset}
  */
-  createCopy(filename: string, src: Dataset, options?: string[]|object, strict?: boolean, progress_cb?: ProgressCb): Dataset
+  createCopy(filename: string, src: Dataset, options?: string[]|object, progress_cb?: ProgressCb, strict?: boolean): Dataset
 
   /**
  * Asynchronously create a copy of a dataset.
@@ -2766,14 +2909,13 @@ export class Driver {
  * @method createCopyAsync
  * @param {string} filename
  * @param {gdal.Dataset} src
- * @param {string[]|object} [options=null] An array or object containing
- * driver-specific dataset creation options
+ * @param {string[]|object} [options=null] An array or object containing driver-specific dataset creation options
+ * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}. When specified in Promise mode, strict must also be present or progress_cb will be interpreted as a result callback.
  * @param {boolean} [strict=false] strict mode
- * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}
  * @param {callback<gdal.Dataset>} [callback=undefined] {{{cb}}}
  * @return {Promise<gdal.Dataset>}
  */
-  createCopyAsync(filename: string, src: Dataset, options?: string[]|object, strict?: boolean, progress_cb?: ProgressCb, callback?: callback<Dataset>): Promise<Dataset>
+  createCopyAsync(filename: string, src: Dataset, options?: string[]|object, progress_cb?: ProgressCb, strict?: boolean, callback?: callback<Dataset>): Promise<Dataset>
 
   /**
  * Copy the files of a dataset.
@@ -3198,7 +3340,7 @@ export class FeatureDefn {
   clone(): FeatureDefn
 }
 
-export class FeatureDefnFields implements Iterable<FieldDefn> {
+export class FeatureDefnFields implements Iterable<FieldDefn>, AsyncIterable<FieldDefn> {
 /**
  * An encapsulation of a {{#crossLink
  * "gdal.FeatureDefn"}}FeatureDefn{{/crossLink}}'s fields.
@@ -3216,6 +3358,8 @@ export class FeatureDefnFields implements Iterable<FieldDefn> {
  */
   readonly featureDefn: FeatureDefn
   [Symbol.iterator](): Iterator<FieldDefn>
+  [Symbol.asyncIterator](): AsyncIterator<FieldDefn>
+
   /**
  * Returns the number of fields.
  *
@@ -3288,7 +3432,7 @@ export class FeatureDefnFields implements Iterable<FieldDefn> {
  *
  * @example
  * ```
- * featureDefn.forEach(function(field, i) { ... });```
+ * featureDefn.forEach(function(array, i) { ... });```
  *
  * @for gdal.FeatureDefnFields
  * @method forEach
@@ -3297,12 +3441,12 @@ export class FeatureDefnFields implements Iterable<FieldDefn> {
   forEach(callback: forEachCb<FieldDefn>): void
 
   /**
- * Iterates through all field definitions using a callback function and builds
+ * Iterates through field definitions arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = featureDefn.map(function(field, i) {
+ * var result = featureDefn.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -3442,6 +3586,23 @@ export class FeatureFields {
   getNames(): string[]
 
   /**
+ * Iterates through field definitions arrays using a callback function and builds
+ * an array of the returned values.
+ *
+ * @example
+ * ```
+ * var result = layer.features.get(0).fields.map(function(array, i) {
+ *     return value;
+ * });```
+ *
+ * @for gdal.FeatureFields
+ * @method map<U>
+ * @param {mapCb<gdal.fieldValue,U>} callback The callback to be called with each {{#crossLink "fieldValue"}}fieldValue{{/crossLink}}
+ * @return {U[]}
+ */
+  map<U>(callback: mapCb<fieldValue,U>): U[]
+
+  /**
  * Iterates through all fields using a callback function.
  *
  * @example
@@ -3453,23 +3614,6 @@ export class FeatureFields {
  * @param {forEachCb<fieldValue>} callback The callback to be called with each feature `value` and `key`.
  */
   forEach(callback: forEachCb<fieldValue>): void
-
-  /**
- * Iterates through all fields using a callback function and builds
- * an array of the returned values.
- *
- * @example
- * ```
- * var result = layer.features.get(0).fields.map(function(value, key) {
- *     return value;
- * });```
- *
- * @for gdal.FeatureFields
- * @method map<U>
- * @param {mapCb<fieldValue,U>} callback The callback to be called with each feature `value` and `key`.
- * @return {U[]}
- */
-  map<U>(callback: mapCb<fieldValue,U>): U[]
 
   /**
  * Outputs the fields as a serialized JSON string.
@@ -3542,6 +3686,7 @@ export class GDALDrivers implements Iterable<Driver> {
  */
   constructor()
   [Symbol.iterator](): Iterator<Driver>
+
   /**
  * Returns a driver with the specified name.
  *
@@ -3573,11 +3718,11 @@ export class GDALDrivers implements Iterable<Driver> {
   count(): number
 
   /**
- * Iterates through all registered drivers using a callback function.
+ * Iterates through all drivers using a callback function.
  *
  * @example
  * ```
- * gdal.drivers.forEach(function(driver, i) { ... });```
+ * gdal.drivers.forEach(function(array, i) { ... });```
  *
  * @for gdal.GDALDrivers
  * @method forEach
@@ -3586,12 +3731,12 @@ export class GDALDrivers implements Iterable<Driver> {
   forEach(callback: forEachCb<Driver>): void
 
   /**
- * Iterates through all drivers using a callback function and builds
+ * Iterates through drivers arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = gdal.drivers.map(function(driver, i) {
+ * var result = gdal.drivers.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -4626,7 +4771,7 @@ export class GeometryCollection extends Geometry {
   getLength(): number
 }
 
-export class GeometryCollectionChildren {
+export class GeometryCollectionChildren implements Iterable<Geometry> {
 /**
  * A collection of Geometries, used by {{#crossLink
  * "gdal.GeometryCollection"}}gdal.GeometryCollection{{/crossLink}}.
@@ -4634,6 +4779,7 @@ export class GeometryCollectionChildren {
  * @class gdal.GeometryCollectionChildren
  */
   constructor()
+  [Symbol.iterator](): Iterator<Geometry>
 
   /**
  * Returns the number of items.
@@ -4685,7 +4831,7 @@ export class GeometryCollectionChildren {
  *
  * @example
  * ```
- * geometryCollection.children.forEach(function(geometry, i) { ... });```
+ * geometryCollection.children.forEach(function(array, i) { ... });```
  *
  * @for gdal.GeometryCollectionChildren
  * @method forEach
@@ -4694,12 +4840,12 @@ export class GeometryCollectionChildren {
   forEach(callback: forEachCb<Geometry>): void
 
   /**
- * Iterates through all child geometries using a callback function and builds
+ * Iterates through child geometries arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = geometryCollection.children.map(function(geometry, i) {
+ * var result = geometryCollection.children.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -4709,15 +4855,6 @@ export class GeometryCollectionChildren {
  * @return {U[]}
  */
   map<U>(callback: mapCb<Geometry,U>): U[]
-
-  /**
- * Outputs all geometries as a regular javascript array.
- *
- * @for gdal.GeometryCollectionChildren
- * @method toArray
- * @return {gdal.Geometry[]} List of {{#crossLink "Geometry"}}Geometry{{/crossLink}} instances.
- */
-  toArray(): Geometry[]
 }
 
 export class Group {
@@ -4764,7 +4901,7 @@ export class Group {
   readonly attributes: GroupAttributes
 }
 
-export class GroupArrays implements Iterable<MDArray> {
+export class GroupArrays implements Iterable<MDArray>, AsyncIterable<MDArray> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Group{{/crossLink}}'s
  * descendant arrays.
@@ -4789,6 +4926,8 @@ export class GroupArrays implements Iterable<MDArray> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<MDArray>
+  [Symbol.asyncIterator](): AsyncIterator<MDArray>
+
   /**
  * Returns the array with the given name/index.
  *
@@ -4843,7 +4982,7 @@ export class GroupArrays implements Iterable<MDArray> {
   forEach(callback: forEachCb<MDArray>): void
 
   /**
- * Iterates through all arrays using a callback function and builds
+ * Iterates through arrays arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -4860,7 +4999,7 @@ export class GroupArrays implements Iterable<MDArray> {
   map<U>(callback: mapCb<MDArray,U>): U[]
 }
 
-export class GroupAttributes implements Iterable<Attribute> {
+export class GroupAttributes implements Iterable<Attribute>, AsyncIterable<Attribute> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Group{{/crossLink}}'s
  * descendant attributes.
@@ -4885,6 +5024,8 @@ export class GroupAttributes implements Iterable<Attribute> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<Attribute>
+  [Symbol.asyncIterator](): AsyncIterator<Attribute>
+
   /**
  * Returns the attribute with the given name/index.
  *
@@ -4934,12 +5075,12 @@ export class GroupAttributes implements Iterable<Attribute> {
  *
  * @for gdal.GroupAttributes
  * @method forEach
- * @param {forEachCb<gdal.Dimension>} callback The callback to be called with each {{#crossLink "Dimension"}}Dimension{{/crossLink}}
+ * @param {forEachCb<gdal.Attribute>} callback The callback to be called with each {{#crossLink "Attribute"}}Attribute{{/crossLink}}
  */
-  forEach(callback: forEachCb<Dimension>): void
+  forEach(callback: forEachCb<Attribute>): void
 
   /**
- * Iterates through all attributes using a callback function and builds
+ * Iterates through attributes arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -4956,7 +5097,7 @@ export class GroupAttributes implements Iterable<Attribute> {
   map<U>(callback: mapCb<Attribute,U>): U[]
 }
 
-export class GroupDimensions implements Iterable<Dimension> {
+export class GroupDimensions implements Iterable<Dimension>, AsyncIterable<Dimension> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Group{{/crossLink}}'s
  * descendant dimensions.
@@ -4984,6 +5125,8 @@ export class GroupDimensions implements Iterable<Dimension> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<Dimension>
+  [Symbol.asyncIterator](): AsyncIterator<Dimension>
+
   /**
  * Returns the array with the given name/index.
  *
@@ -5038,12 +5181,12 @@ export class GroupDimensions implements Iterable<Dimension> {
   forEach(callback: forEachCb<Dimension>): void
 
   /**
- * Iterates through all dimensions using a callback function and builds
+ * Iterates through dimensions arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = group.dimensions.map(function(dimension, i) {
+ * var result = group.dimensions.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -5055,7 +5198,7 @@ export class GroupDimensions implements Iterable<Dimension> {
   map<U>(callback: mapCb<Dimension,U>): U[]
 }
 
-export class GroupGroups implements Iterable<Group> {
+export class GroupGroups implements Iterable<Group>, AsyncIterable<Group> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Group{{/crossLink}}'s
  * descendant groups.
@@ -5081,6 +5224,8 @@ export class GroupGroups implements Iterable<Group> {
  */
   readonly ds: Dataset
   [Symbol.iterator](): Iterator<Group>
+  [Symbol.asyncIterator](): AsyncIterator<Group>
+
   /**
  * Returns the group with the given name/index.
  *
@@ -5135,12 +5280,12 @@ export class GroupGroups implements Iterable<Group> {
   forEach(callback: forEachCb<Group>): void
 
   /**
- * Iterates through all groups using a callback function and builds
+ * Iterates through groups arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = group.groups.map(function(group, i) {
+ * var result = group.groups.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -5233,7 +5378,7 @@ export class Layer {
  * @method flushAsync
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<void>}
- * 
+ *
  */
   flushAsync(callback?: callback<void>): Promise<void>
 
@@ -5293,7 +5438,7 @@ export class Layer {
  * "population > 1000000 and population < 5000000" where `population` is an
  * attribute in the layer. The query format is normally a restricted form of
  * SQL WHERE clause as described in the "WHERE" section of the [OGR SQL
- * tutorial](http://www.gdal.org/ogr_sql.html). In some cases (RDBMS backed
+ * tutorial](https://gdal.org/user/ogr_sql_dialect.html). In some cases (RDBMS backed
  * drivers) the native capabilities of the database may be used to interprete
  * the WHERE clause in which case the capabilities will be broader than those
  * of OGR SQL.
@@ -5309,7 +5454,7 @@ export class Layer {
   setAttributeFilter(filter: string): void
 }
 
-export class LayerFeatures implements Iterable<Feature> {
+export class LayerFeatures implements Iterable<Feature>, AsyncIterable<Feature> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Layer"}}Layer{{/crossLink}}'s
  * features.
@@ -5326,6 +5471,8 @@ export class LayerFeatures implements Iterable<Feature> {
  */
   layer: Layer
   [Symbol.iterator](): Iterator<Feature>
+  [Symbol.asyncIterator](): AsyncIterator<Feature>
+
   /**
  * Fetch a feature by its identifier.
  *
@@ -5512,6 +5659,23 @@ export class LayerFeatures implements Iterable<Feature> {
   removeAsync(id: number, callback?: callback<void>): Promise<void>
 
   /**
+ * Iterates through features arrays using a callback function and builds
+ * an array of the returned values.
+ *
+ * @example
+ * ```
+ * var result = layer.features.map(function(array, i) {
+ *     return value;
+ * });```
+ *
+ * @for gdal.LayerFeatures
+ * @method map<U>
+ * @param {mapCb<gdal.Feature,U>} callback The callback to be called with each {{#crossLink "Feature"}}Feature{{/crossLink}}
+ * @return {U[]}
+ */
+  map<U>(callback: mapCb<Feature,U>): U[]
+
+  /**
  * Iterates through all features using a callback function.
  *
  * @example
@@ -5523,26 +5687,9 @@ export class LayerFeatures implements Iterable<Feature> {
  * @param {forEachCb<gdal.Feature>} callback The callback to be called with each {{#crossLink "Feature"}}Feature{{/crossLink}}
  */
   forEach(callback: forEachCb<Feature>): void
-
-  /**
- * Iterates through all features using a callback function and builds
- * an array of the returned values.
- *
- * @example
- * ```
- * var result = layer.features.map(function(band, i) {
- *     return value;
- * });```
- *
- * @for gdal.LayerFeatures
- * @method map<U>
- * @param {mapCb<gdal.Feature,U>} callback The callback to be called with each {{#crossLink "Feature"}}Feature{{/crossLink}}
- * @return {U[]}
- */
-  map<U>(callback: mapCb<Feature,U>): U[]
 }
 
-export class LayerFields implements Iterable<FieldDefn> {
+export class LayerFields implements Iterable<FieldDefn>, AsyncIterable<FieldDefn> {
 /**
  * @class gdal.LayerFields
  */
@@ -5557,6 +5704,8 @@ export class LayerFields implements Iterable<FieldDefn> {
  */
   readonly layer: Layer
   [Symbol.iterator](): Iterator<FieldDefn>
+  [Symbol.asyncIterator](): AsyncIterator<FieldDefn>
+
   /**
  * Returns the number of fields.
  *
@@ -5632,7 +5781,7 @@ export class LayerFields implements Iterable<FieldDefn> {
  *
  * @example
  * ```
- * layer.fields.forEach(function(field, i) { ... });```
+ * layer.fields.forEach(function(array, i) { ... });```
  *
  * @for gdal.LayerFields
  * @method forEach
@@ -5641,12 +5790,12 @@ export class LayerFields implements Iterable<FieldDefn> {
   forEach(callback: forEachCb<FieldDefn>): void
 
   /**
- * Iterates through all field definitions using a callback function and builds
+ * Iterates through field definitions arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = layer.fields.map(function(field, i) {
+ * var result = layer.fields.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -5694,6 +5843,7 @@ export class LineStringPoints implements Iterable<Point> {
  */
   constructor()
   [Symbol.iterator](): Iterator<Point>
+
   /**
  * Returns the number of points that are part of the line string.
  *
@@ -5784,7 +5934,7 @@ export class LineStringPoints implements Iterable<Point> {
  *
  * @example
  * ```
- * lineString.points.forEach(function(point, i) { ... });```
+ * lineString.points.forEach(function(array, i) { ... });```
  *
  * @for gdal.LineStringPoints
  * @method forEach
@@ -5793,12 +5943,12 @@ export class LineStringPoints implements Iterable<Point> {
   forEach(callback: forEachCb<Point>): void
 
   /**
- * Iterates through all points using a callback function and builds
+ * Iterates through points arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = lineString.points.map(function(point, i) {
+ * var result = lineString.points.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -6147,6 +6297,7 @@ export class PolygonRings implements Iterable<LineString> {
  */
   constructor()
   [Symbol.iterator](): Iterator<LineString>
+
   /**
  * Returns the number of rings that exist in the collection.
  *
@@ -6199,7 +6350,7 @@ export class PolygonRings implements Iterable<LineString> {
  *
  * @example
  * ```
- * polygon.rings.forEach(function(ring, i) { ... });```
+ * polygon.rings.forEach(function(array, i) { ... });```
  *
  * @for gdal.PolygonRings
  * @method forEach
@@ -6208,12 +6359,12 @@ export class PolygonRings implements Iterable<LineString> {
   forEach(callback: forEachCb<LineString>): void
 
   /**
- * Iterates through all rings using a callback function and builds
+ * Iterates through rings arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = polygon.rings.map(function(ring, i) {
+ * var result = polygon.rings.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -6603,7 +6754,7 @@ export class RasterBand {
   setMetadataAsync(metadata: object|string[], domain?: string, callback?: callback<void>): Promise<boolean>
 }
 
-export class RasterBandOverviews implements Iterable<RasterBand> {
+export class RasterBandOverviews implements Iterable<RasterBand>, AsyncIterable<RasterBand> {
 /**
  * An encapsulation of a {{#crossLink
  * "gdal.RasterBand"}}RasterBand{{/crossLink}} overview functionality.
@@ -6612,6 +6763,8 @@ export class RasterBandOverviews implements Iterable<RasterBand> {
  */
   constructor()
   [Symbol.iterator](): Iterator<RasterBand>
+  [Symbol.asyncIterator](): AsyncIterator<RasterBand>
+
   /**
  * Fetches the overview at the provided index.
  *
@@ -6621,6 +6774,18 @@ export class RasterBandOverviews implements Iterable<RasterBand> {
  * @return {gdal.RasterBand}
  */
   get(index: number): RasterBand
+
+  /**
+ * Fetches the overview at the provided index.
+ * {{{async}}}
+ *
+ * @method getAsync
+ * @throws Error
+ * @param {number} index 0-based index
+ * @param {callback<gdal.RasterBand>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.RasterBand>}
+ */
+  getAsync(index: number, callback?: callback<RasterBand>): Promise<RasterBand>
 
   /**
  * Fetch best sampling overview.
@@ -6638,6 +6803,23 @@ export class RasterBandOverviews implements Iterable<RasterBand> {
   getBySampleCount(samples: number): RasterBand
 
   /**
+ * Fetch best sampling overview.
+ * {{{async}}}
+ *
+ * Returns the most reduced overview of the given band that still satisfies the
+ * desired number of samples. This function can be used with zero as the number
+ * of desired samples to fetch the most reduced overview. The same band as was
+ * passed in will be returned if it has not overviews, or if none of the
+ * overviews have enough samples.
+ *
+ * @method getBySampleCountAsync
+ * @param {number} samples
+ * @param {callback<gdal.RasterBand>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.RasterBand>}
+ */
+  getBySampleCountAsync(samples: number, callback?: callback<RasterBand>): Promise<RasterBand>
+
+  /**
  * Returns the number of overviews.
  *
  * @method count
@@ -6646,25 +6828,34 @@ export class RasterBandOverviews implements Iterable<RasterBand> {
   count(): number
 
   /**
+ * Returns the number of overviews.
+ *
+ * @method countAsync
+ * @param {callback<gdal.RasterBand>} [callback=undefined] {{{cb}}}
+ * @return {Promise<number>}
+ */
+  countAsync(callback?: callback<RasterBand>): Promise<number>
+
+  /**
  * Iterates through all overviews using a callback function.
  *
  * @example
  * ```
- * band.overviews.forEach(function(overviewBand, i) { ... });```
+ * band.overviews.forEach(function(array, i) { ... });```
  *
  * @for gdal.RasterBandOverviews
  * @method forEach
- * @param {forEachCb<gdal.RasterBand>} callback
+ * @param {forEachCb<gdal.RasterBand>} callback The callback to be called with each {{#crossLink "RasterBand"}}RasterBand{{/crossLink}}
  */
   forEach(callback: forEachCb<RasterBand>): void
 
   /**
- * Iterates through all raster overviews using a callback function and builds
+ * Iterates through overviews arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
  * ```
- * var result = band.overviews.map(function(overviewBand, i) {
+ * var result = band.overviews.map(function(array, i) {
  *     return value;
  * });```
  *
@@ -7249,6 +7440,23 @@ export class SpatialReference {
   static fromCRSURL(input: string): SpatialReference
 
   /**
+ * Initialize from OGC URL.
+ * {{{async}}}
+ *
+ * The OGC URL should be prefixed with "http://opengis.net/def/crs" per best
+ * practice paper 11-135. Currently EPSG and OGC authority values are supported,
+ * including OGC auto codes, but not including CRS1 or CRS88 (NAVD88).
+ *
+ * @static
+ * @throws Error
+ * @method fromCRSURLAsync
+ * @param {string} input
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.SpatialReference>}
+ */
+  static fromCRSURLAsync(input: string, callback?: callback<void>): Promise<SpatialReference>
+
+  /**
  * Initialize spatial reference from a URL.
  *
  * This method will download the spatial reference from the given URL.
@@ -7260,6 +7468,21 @@ export class SpatialReference {
  * @return {gdal.SpatialReference}
  */
   static fromURL(url: string): SpatialReference
+
+  /**
+ * Initialize spatial reference from a URL.
+ * {{async}}
+ *
+ * This method will download the spatial reference from the given URL.
+ *
+ * @static
+ * @throws Error
+ * @method fromURLAsync
+ * @param {string} url
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.SpatialReference>}
+ */
+  static fromURLAsync(url: string, callback?: callback<void>): Promise<SpatialReference>
 
   /**
  * Initialize from a Mapinfo style CoordSys definition.
@@ -7285,6 +7508,22 @@ export class SpatialReference {
  * @return {gdal.SpatialReference}
  */
   static fromUserInput(input: string): SpatialReference
+
+  /**
+ * Initialize from an arbitrary spatial reference string.
+ *
+ * This method will examine the provided input, and try to deduce the format,
+ * and then use it to initialize the spatial reference system.
+ * {{{async}}}
+ *
+ * @static
+ * @throws Error
+ * @method fromUserInputAsync
+ * @param {string} input
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.SpatialReference>}
+ */
+  static fromUserInputAsync(input: string, callback?: callback<void>): Promise<SpatialReference>
 
   /**
  * Initialize from EPSG GCS or PCS code.
@@ -7411,39 +7650,42 @@ export class config {
 
 export class vsimem {
 /**
- * @class vsimem
- * Operations on in-memory /vsimem/ files
+ * Operations on in-memory `/vsimem/` files
+ *
+ * @class gdal.vsimem
  */
   constructor()
 
   /**
- * Create an in-memory /vsimem/ file from a Buffer.
+ * Create an in-memory `/vsimem/` file from a `Buffer`.
  * This is a zero-copy operation - GDAL will read from the Buffer which will be
  * protected by the GC even if it goes out of scope.
- * The file will stay in memory until it is deleted with gdal.vsimem.release.
+ * The file will stay in memory until it is deleted with `gdal.vsimem.release`.
  *
  * @static
  * @method set
  * @param {Buffer} data A binary buffer containing the file data
- * @param {string} filename A file name beginning with /vsimem/
+ * @param {string} filename A file name beginning with `/vsimem/`
  */
   static set(data: Buffer, filename: string): void
 
   /**
- * Delete and retrieve the contents of an in-memory /vsimem/ file.
+ * Delete and retrieve the contents of an in-memory `/vsimem/` file.
  * This is a very fast zero-copy operation.
  * It does not block the event loop.
- * WARNING!
- * The file must not be open or random memory corruption is possible with GDAL <= 3.3.1.
- * GDAL >= 3.3.2 will fail gracefully further operations and this function is safe.
- * If the file was created by vsimem.set, it will return a reference
- * to the same Buffer that was used to create it.
- * Otherwise it will construct a new Buffer object with the GDAL
+ * If the file was created by `vsimem.set`, it will return a reference
+ * to the same `Buffer` that was used to create it.
+ * Otherwise it will construct a new `Buffer` object with the GDAL
  * allocated buffer as its backing store.
+ *
+ * ***WARNING***!
+ *
+ * The file must not be open or random memory corruption is possible with GDAL <= 3.3.1.
+ * GDAL >= 3.3.2 will gracefully fail further operations and this function is safe.
  *
  * @static
  * @method release
- * @param {string} filename A file name beginning with /vsimem/
+ * @param {string} filename A file name beginning with `/vsimem/`
  * @throws
  * @return {Buffer} A binary buffer containing all the data
  */

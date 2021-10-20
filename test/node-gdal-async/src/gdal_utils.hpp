@@ -1,5 +1,5 @@
-#ifndef __GDAL_WARPER_H__
-#define __GDAL_WARPER_H__
+#ifndef __GDAL_UTILS_H__
+#define __GDAL_UTILS_H__
 
 // node
 #include <node.h>
@@ -11,6 +11,7 @@
 // gdal
 #include <gdal_alg.h>
 #include <gdal_priv.h>
+#include <gdal_utils.h>
 
 // ogr
 #include <ogrsf_frmts.h>
@@ -20,18 +21,19 @@
 using namespace v8;
 using namespace node;
 
-// Methods and classes from gdalwarper.h
-// https://gdal.org/doxygen/gdalwarper_8h.html
+// Methods and classes from gdal_utils.h
+// https://gdal.org/development/rfc/rfc59.1_utilities_as_a_library.html
 
 namespace node_gdal {
-namespace Warper {
+namespace Utils {
 
 void Initialize(Local<Object> target);
 
-GDAL_ASYNCABLE_GLOBAL(reprojectImage);
-GDAL_ASYNCABLE_GLOBAL(suggestedWarpOutput);
+GDAL_ASYNCABLE_GLOBAL(info);
+GDAL_ASYNCABLE_GLOBAL(translate);
+GDAL_ASYNCABLE_GLOBAL(vectorTranslate);
 
-} // namespace Warper
+} // namespace Utils
 } // namespace node_gdal
 
 #endif
