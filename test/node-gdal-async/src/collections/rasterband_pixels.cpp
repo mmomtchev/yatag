@@ -8,10 +8,6 @@
 
 namespace node_gdal {
 
-/**
- * @typedef TypedArray Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array
- */
-
 Nan::Persistent<FunctionTemplate> RasterBandPixels::constructor;
 
 void RasterBandPixels::Initialize(Local<Object> target) {
@@ -28,6 +24,7 @@ void RasterBandPixels::Initialize(Local<Object> target) {
   Nan__SetPrototypeAsyncableMethod(lcons, "write", write);
   Nan__SetPrototypeAsyncableMethod(lcons, "readBlock", readBlock);
   Nan__SetPrototypeAsyncableMethod(lcons, "writeBlock", writeBlock);
+  Nan__SetPrototypeAsyncableMethod(lcons, "clampBlock", clampBlock);
 
   ATTR_DONT_ENUM(lcons, "band", bandGetter, READ_ONLY_SETTER);
 
@@ -69,7 +66,6 @@ RasterBand *RasterBandPixels::parent(const Nan::FunctionCallbackInfo<v8::Value> 
  * @class gdal.RasterBandPixels
  */
 NAN_METHOD(RasterBandPixels::New) {
-  Nan::HandleScope scope;
 
   if (!info.IsConstructCall()) {
     Nan::ThrowError("Cannot call constructor as function, you need to use 'new' keyword");
@@ -103,7 +99,6 @@ Local<Value> RasterBandPixels::New(Local<Value> band_obj) {
 }
 
 NAN_METHOD(RasterBandPixels::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("RasterBandPixels").ToLocalChecked());
 }
 
@@ -128,7 +123,6 @@ NAN_METHOD(RasterBandPixels::toString) {
  * @return {Promise<number>}
  */
 GDAL_ASYNCABLE_DEFINE(RasterBandPixels::get) {
-  Nan::HandleScope scope;
 
   RasterBand *band;
   if ((band = parent(info)) == nullptr) return;
@@ -175,7 +169,6 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::get) {
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(RasterBandPixels::set) {
-  Nan::HandleScope scope;
 
   RasterBand *band;
   if ((band = parent(info)) == nullptr) return;
@@ -255,18 +248,6 @@ static inline int findHighest(int w, int h, int px, int ln, int offset) {
 }
 
 /**
- * @typedef ReadOptions
- * @property {number} [buffer_width]
- * @property {number} [buffer_height]
- * @property {string} [type]
- * @property {number} [pixel_space]
- * @property {number} [line_space]
- * @property {string} [resampling]
- * @property {ProgressCb} [progress_cb]
- * @property {number} [offset]
- */
-
-/**
  * Reads a region of pixels.
  *
  * @method read
@@ -309,7 +290,6 @@ static inline int findHighest(int w, int h, int px, int ln, int offset) {
  * @return {Promise<TypedArray>} A TypedArray (https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView#Typed_array_subclasses) of values.
  */
 GDAL_ASYNCABLE_DEFINE(RasterBandPixels::read) {
-  Nan::HandleScope scope;
 
   RasterBand *band;
   if ((band = parent(info)) == nullptr) return;
@@ -417,16 +397,6 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::read) {
 }
 
 /**
- * @typedef WriteOptions
- * @property {number} [buffer_width]
- * @property {number} [buffer_height]
- * @property {number} [pixel_space]
- * @property {number} [line_space]
- * @property {ProgressCb} [progress_cb]
- * @property {number} [offset]
- */
-
-/**
  * Writes a region of pixels.
  *
  * @method write
@@ -464,7 +434,6 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::read) {
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(RasterBandPixels::write) {
-  Nan::HandleScope scope;
 
   RasterBand *band;
   if ((band = parent(info)) == nullptr) return;
@@ -573,7 +542,6 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::write) {
  */
 
 GDAL_ASYNCABLE_DEFINE(RasterBandPixels::readBlock) {
-  Nan::HandleScope scope;
 
   RasterBand *band;
   if ((band = parent(info)) == nullptr) return;
@@ -643,7 +611,6 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::readBlock) {
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(RasterBandPixels::writeBlock) {
-  Nan::HandleScope scope;
 
   RasterBand *band;
   if ((band = parent(info)) == nullptr) return;
@@ -679,6 +646,62 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::writeBlock) {
 }
 
 /**
+ * Clamp the block size for a given block offset.
+ * Handles partial blocks at the edges of the raster and returns the true number of pixels.
+ *
+ * @method clampBlock
+ * @throws Error
+ * @param {number} x
+ * @param {number} y
+ * @return {xyz} A size object.
+ */
+
+/**
+ * Clamp the block size for a given block offset.
+ * Handles partial blocks at the edges of the raster and returns the true number of pixels.
+ * {{{async}}}
+ *
+ * @method clampBlockAsync
+ * @throws Error
+ * @param {number} x
+ * @param {number} y
+ * @param {callback<xyz>} [callback=undefined] {{{cb}}}
+ * @return {Promise<xyz>} A size object.
+ */
+
+GDAL_ASYNCABLE_DEFINE(RasterBandPixels::clampBlock) {
+
+  RasterBand *band;
+  if ((band = parent(info)) == nullptr) return;
+
+  int x, y;
+  NODE_ARG_INT(0, "block_x_offset", x);
+  NODE_ARG_INT(1, "block_y_offset", y);
+
+  struct xy {
+    int x, y;
+  };
+  GDALRasterBand *gdal_band = band->get();
+  GDALAsyncableJob<xy> job(band->parent_uid);
+  job.persist(band->handle());
+  job.main = [gdal_band, x, y](const GDALExecutionProgress &) {
+    xy r;
+    CPLErrorReset();
+    CPLErr err = gdal_band->GetActualBlockSize(x, y, &r.x, &r.y);
+    if (err != CE_None) { throw CPLGetLastErrorMsg(); }
+    return r;
+  };
+  job.rval = [](xy r, GetFromPersistentFunc) {
+    Nan::EscapableHandleScope scope;
+    Local<Object> result = Nan::New<Object>();
+    Nan::Set(result, Nan::New("x").ToLocalChecked(), Nan::New<Integer>(r.x));
+    Nan::Set(result, Nan::New("y").ToLocalChecked(), Nan::New<Integer>(r.y));
+    return scope.Escape(result.As<Value>());
+  };
+  job.run(info, async, 2);
+}
+
+/**
  * Parent raster band
  *
  * @readOnly
@@ -686,7 +709,6 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::writeBlock) {
  * @type {gdal.RasterBand}
  */
 NAN_GETTER(RasterBandPixels::bandGetter) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("parent_").ToLocalChecked()).ToLocalChecked());
 }
 

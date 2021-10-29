@@ -72,7 +72,7 @@ gdal.config.set = gdal.setConfigOption
 delete gdal.getConfigOption
 delete gdal.setConfigOption
 
-if (process.env.CURL_CA_BUNDLE === undefined) {
+if (process.env.CURL_CA_BUNDLE === undefined && gdal.bundled) {
   gdal.config.set('CURL_CA_BUNDLE', path.resolve(__dirname, '../deps/libcurl/cacert.pem'))
 }
 
@@ -130,6 +130,15 @@ gdal.Layer.prototype.getExtent = function () {
   return new gdal.Envelope(obj)
 }
 
+const readStream = require('./readable.js')
+const writeStream = require('./writable.js')
+const muxStream = require('./multiplexer.js')
+gdal.RasterBandPixels.prototype.createReadStream = readStream.createReadStream
+gdal.RasterReadStream = readStream.RasterReadStream
+gdal.RasterBandPixels.prototype.createWriteStream = writeStream.createWriteStream
+gdal.RasterWriteStream = writeStream.RasterWriteStream
+gdal.RasterMuxStream = muxStream.RasterMuxStream
+
 /**
  * Returns a {{#crossLink "Envelope"}}gdal.Envelope{{/crossLink}} object for the raster bands
  *
@@ -155,17 +164,6 @@ gdal.DatasetBands.prototype.getEnvelope = function () {
   })
 }
 
-/**
- * @interface xyz
- * @property {number} x
- * @property {number} y
- * @property {number} [z]
- */
-
-/**
- * A simple key/value structure
- * @interface fieldValue { key: string, value: any }
- */
 require('./iterators.js')(gdal)
 
 /**
@@ -637,6 +635,7 @@ const promisifiables = {
     writeAsync: 11,
     readBlockAsync: 3,
     writeBlockAsync: 3,
+    clampBlockAsync: 2,
     getAsync: 2,
     setAsync: 3
   },
@@ -731,9 +730,10 @@ const promisifiables = {
     $polygonizeAsync: 1,
     $reprojectImageAsync: 1,
     $suggestedWarpOutputAsync: 1,
-    $translateAsync: 3,
-    $vectorTranslateAsync: 3,
+    $translateAsync: 4,
+    $vectorTranslateAsync: 4,
     $infoAsync: 2,
+    $warpAsync: 5,
     $_acquireLocksAsync: 3
   }
 }

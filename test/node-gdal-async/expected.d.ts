@@ -1,3 +1,12 @@
+import * as stream from 'stream';
+
+export type Color = {
+	c1: number;
+	c2: number;
+	c3: number;
+	c4: number;
+}
+
 export type ContourOptions = {
 	src: RasterBand;
 	dst: Layer;
@@ -7,6 +16,10 @@ export type ContourOptions = {
 	nodata?: number;
 	idField?: number;
 	elevField?: number;
+	progress_cb?: ProgressCb;
+}
+
+export type CreateOptions = {
 	progress_cb?: ProgressCb;
 }
 
@@ -24,16 +37,6 @@ export type MDArrayOptions = {
 	data_type?: string;
 	data?: TypedArray;
 	_offset?: number;
-}
-
-export type PolygonizeOptions = {
-	src: RasterBand;
-	dst: Layer;
-	mask?: RasterBand;
-	pixValField: number;
-	connectedness?: number;
-	useFloats?: boolean;
-	progress_cb?: ProgressCb;
 }
 
 export type ProgressCb = ( complete: number, msg: string ) => void
@@ -85,6 +88,10 @@ export type SieveOptions = {
 
 export type TypedArray = Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array
 
+export type UtilOptions = {
+	progress_cb?: ProgressCb;
+}
+
 export type WarpOptions = {
 	src: Dataset;
 	s_srs: SpatialReference;
@@ -122,6 +129,14 @@ export type stats = {
 export type units = {
 	units: string;
 	value: number;
+}
+
+export interface RasterReadableOptions extends stream.ReadableOptions {
+	blockOptimize: boolean;
+}
+
+export interface RasterWritableOptions extends stream.WritableOptions {
+	blockOptimize: boolean;
 }
 
 export interface fieldValue { key: string, value: any }
@@ -639,6 +654,38 @@ export interface xyz {
    * @type {string}
    */
   export const GEDTC_String: string
+
+  /**
+   * CMYK
+   * @final
+   * @property gdal.GPI_CMYK
+   * @type {string}
+   */
+  export const GPI_CMYK: string
+
+  /**
+   * Grayscale, only c1 defined
+   * @final
+   * @property gdal.GPI_Gray
+   * @type {string}
+   */
+  export const GPI_Gray: string
+
+  /**
+   * HLS, c4 is not defined
+   * @final
+   * @property gdal.GPI_HLS
+   * @type {string}
+   */
+  export const GPI_HLS: string
+
+  /**
+   * RGBA, alpha in c4
+   * @final
+   * @property gdal.GPI_RGB
+   * @type {string}
+   */
+  export const GPI_RGB: string
 
   /**
    * @final
@@ -1358,10 +1405,10 @@ export interface xyz {
  * @for gdal
  * @static
  * @param {gdal.Dataset} dataset
- * @param {string[]} array of CLI options for gdalinfo
+ * @param {string[]} [args] array of CLI options for gdalinfo
  * @return {string}
  */
-  export function info(dataset: Dataset, array: string[]): string
+  export function info(dataset: Dataset, args?: string[]): string
 
   /**
  * Library version of gdalinfo.
@@ -1376,11 +1423,11 @@ export interface xyz {
  * @for gdal
  * @static
  * @param {gdal.Dataset} dataset
- * @param {string[]} array of CLI options for gdalinfo
+ * @param {string[]} [args] array of CLI options for gdalinfo
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<string>}
  */
-  export function infoAsync(dataset: Dataset, array: string[], callback?: callback<void>): Promise<string>
+  export function infoAsync(dataset: Dataset, args?: string[], callback?: callback<void>): Promise<string>
 
   /**
  * Creates or opens a dataset. Dataset should be explicitly closed with `dataset.close()` method if opened in `"w"` mode to flush any changes. Otherwise, datasets are closed when (and if) node decides to garbage collect them.
@@ -1666,10 +1713,12 @@ export interface xyz {
  * @static
  * @param {string} destination destination filename
  * @param {gdal.Dataset} source source dataset
- * @param {string[]} array of CLI options for gdal_translate
+ * @param {string[]} [args] array of CLI options for gdal_translate
+ * @param {UtilOptions} [options] additional options
+ * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @return {gdal.Dataset}
  */
-  export function translate(destination: string, source: Dataset, array: string[]): Dataset
+  export function translate(destination: string, source: Dataset, args?: string[], options?: UtilOptions): Dataset
 
   /**
  * Library version of gdal_translate.
@@ -1685,11 +1734,13 @@ export interface xyz {
  * @static
  * @param {string} destination destination filename
  * @param {gdal.Dataset} source source dataset
- * @param {string[]} array of CLI options for gdal_translate
+ * @param {string[]} [args] array of CLI options for gdal_translate
+ * @param {UtilOptions} [options] additional options
+ * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<gdal.Dataset>}
  */
-  export function translateAsync(destination: string, source: Dataset, array: string[], callback?: callback<void>): Promise<Dataset>
+  export function translateAsync(destination: string, source: Dataset, args?: string[], options?: UtilOptions, callback?: callback<void>): Promise<Dataset>
 
   /**
  * Library version of ogr2ogr.
@@ -1704,10 +1755,12 @@ export interface xyz {
  * @static
  * @param {string|gdal.Dataset} destination destination
  * @param {gdal.Dataset} source source dataset
- * @param {string[]} array of CLI options for ogr2ogr
+ * @param {string[]} [args] array of CLI options for ogr2ogr
+ * @param {UtilOptions} [options] additional options
+ * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @return {gdal.Dataset}
  */
-  export function vectorTranslate(destination: string|Dataset, source: Dataset, array: string[]): Dataset
+  export function vectorTranslate(destination: string|Dataset, source: Dataset, args?: string[], options?: UtilOptions): Dataset
 
   /**
  * Library version of ogr2ogr.
@@ -1723,11 +1776,13 @@ export interface xyz {
  * @static
  * @param {string|gdal.Dataset} destination destination
  * @param {gdal.Dataset} source source dataset
- * @param {string[]} array of CLI options for ogr2ogr
+ * @param {string[]} [args] array of CLI options for ogr2ogr
+ * @param {UtilOptions} [options] additional options
+ * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<gdal.Dataset>}
  */
-  export function vectorTranslateAsync(destination: string|Dataset, source: Dataset, array: string[], callback?: callback<void>): Promise<Dataset>
+  export function vectorTranslateAsync(destination: string|Dataset, source: Dataset, args?: string[], options?: UtilOptions, callback?: callback<void>): Promise<Dataset>
 
   /**
    * Displays extra debugging information from GDAL.
@@ -1737,6 +1792,50 @@ export interface xyz {
    * @method verbose
    */
   export function verbose(): void
+
+  /**
+ * Library version of gdalwarp.
+ *
+ * @example
+ * const ds = gdal.open('input.tif')
+ * const output = gdal.warp('/vsimem/temp.tif')
+ *
+ * @throws Error
+ * @method warp
+ * @for gdal
+ * @static
+ * @param {string} [dst_path] destination path, null for an in-memory operation
+ * @param {gdal.Dataset} [dst_ds] destination dataset, null for a new dataset
+ * @param {gdal.Dataset[]} src_ds array of source datasets
+ * @param {string[]} [args] array of CLI options for gdalwarp
+ * @param {UtilOptions} [options] additional options
+ * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
+ * @return {gdal.Dataset}
+ */
+  export function warp(dst_path?: string, dst_ds?: Dataset, src_ds: Dataset[], args?: string[], options?: UtilOptions): Dataset
+
+  /**
+ * Library version of gdalinfo.
+ * {{{async}}}
+ *
+ * @example
+ * const ds = gdal.open('input.tif')
+ * const output = gdal.warp('/vsimem/temp.tif')
+ * @throws Error
+ *
+ * @method warpAsync
+ * @for gdal
+ * @static
+ * @param {string} [dst_path] destination path, null for an in-memory operation
+ * @param {gdal.Dataset} [dst_ds] destination dataset, null for a new dataset
+ * @param {gdal.Dataset[]} src_ds array of source datasets
+ * @param {string[]} [args] array of CLI options for gdalwarp
+ * @param {UtilOptions} [options] additional options
+ * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
+ * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @return {Promise<gdal.Dataset>}
+ */
+  export function warpAsync(dst_path?: string, dst_ds?: Dataset, src_ds: Dataset[], args?: string[], options?: UtilOptions, callback?: callback<void>): Promise<Dataset>
 export class ArrayAttributes implements Iterable<Attribute>, AsyncIterable<Attribute> {
 /**
  * An encapsulation of a {{#crossLink "gdal.Group"}}Array{{/crossLink}}'s
@@ -1818,7 +1917,7 @@ export class ArrayAttributes implements Iterable<Attribute>, AsyncIterable<Attri
   forEach(callback: forEachCb<Attribute>): void
 
   /**
- * Iterates through attributes arrays using a callback function and builds
+ * Iterates through attributes using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -1919,7 +2018,7 @@ export class ArrayDimensions implements Iterable<Dimension>, AsyncIterable<Dimen
   forEach(callback: forEachCb<Dimension>): void
 
   /**
- * Iterates through dimensions arrays using a callback function and builds
+ * Iterates through dimensions using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -1976,6 +2075,133 @@ export class CircularString extends SimpleCurve {
  * @extends gdal.SimpleCurve
  */
   constructor()
+}
+
+export class ColorTable implements Iterable<Color> {
+/**
+ * An encapsulation of a {{#crossLink "gdal.RasterBand"}}RasterBand{{/crossLink}}'s
+ * color table.
+ *
+ * ```
+ * var colorTable = band.colorTable;
+ *
+ * band.colorTable = new gdal.ColorTable(gdal.GPI_RGB);
+ * ```
+ *
+ * @class gdal.ColorTable
+ * @param {string} interpretation palette interpretation
+ */
+  constructor(interpretation: string)
+
+  /**
+ * Color interpretation of the palette
+ *
+ * @readOnly
+ * @attribute interpretation
+ * @type {string}
+ */
+  readonly interpretation: string
+
+  /**
+ * Parent band
+ *
+ * @readOnly
+ * @attribute band
+ * @type {gdal.RasterBand|undefined}
+ */
+  readonly band: RasterBand|undefined
+  [Symbol.iterator](): Iterator<Color>
+
+  /**
+ * Clones the instance.
+ * The newly created ColorTable is not owned by any RasterBand.
+ *
+ * @method clone
+ * @return {gdal.ColorTable}
+ */
+  clone(): ColorTable
+
+  /**
+ * Compares two ColorTable objects for equality
+ *
+ * @method isSame
+ * @param {gdal.ColorTable} other
+ * @throws Error
+ * @return {boolean}
+ */
+  isSame(other: ColorTable): boolean
+
+  /**
+ * Returns the color with the given ID.
+ *
+ * @method get
+ * @param {number} index
+ * @throws Error
+ * @return {Color}
+ */
+  get(index: number): Color
+
+  /**
+ * Sets the color entry with the given ID.
+ *
+ * @method set
+ * @throws Error
+ * @param {number} index
+ * @param {Color} color
+ * @return {void}
+ */
+  set(index: number, color: Color): void
+
+  /**
+ * Creates a color ramp from one color entry to another.
+ *
+ * @method ramp
+ * @throws Error
+ * @param {number} start_index
+ * @param {Color} start_color
+ * @param {number} end_index
+ * @param {Color} end_color
+ * @return {number} total number of color entries
+ */
+  ramp(start_index: number, start_color: Color, end_index: number, end_color: Color): number
+
+  /**
+ * Returns the number of color entries.
+ *
+ * @method count
+ * @return {number}
+ */
+  count(): number
+
+  /**
+ * Iterates through all color entries using a callback function.
+ *
+ * @example
+ * ```
+ * band.colorTable.forEach(function(array, i) { ... });```
+ *
+ * @for gdal.ColorTable
+ * @method forEach
+ * @param {forEachCb<gdal.Color>} callback The callback to be called with each {{#crossLink "Color"}}Color{{/crossLink}}
+ */
+  forEach(callback: forEachCb<Color>): void
+
+  /**
+ * Iterates through color entries using a callback function and builds
+ * an array of the returned values.
+ *
+ * @example
+ * ```
+ * var result = band.colorTable.map(function(array, i) {
+ *     return value;
+ * });```
+ *
+ * @for gdal.ColorTable
+ * @method map<U>
+ * @param {mapCb<gdal.Color,U>} callback The callback to be called with each {{#crossLink "Color"}}Color{{/crossLink}}
+ * @return {U[]}
+ */
+  map<U>(callback: mapCb<Color,U>): U[]
 }
 
 export class CompoundCurve extends Geometry {
@@ -2074,7 +2300,7 @@ export class CompoundCurveCurves implements Iterable<SimpleCurve>, AsyncIterable
   forEach(callback: forEachCb<SimpleCurve>): void
 
   /**
- * Iterates through curves arrays using a callback function and builds
+ * Iterates through curves using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -2200,9 +2426,10 @@ export class Dataset {
  *
  * @throws Error
  * @attribute srsAsync
+ * @readOnly
  * @type {Promise<gdal.SpatialReference>}
  */
-  srsAsync: Promise<SpatialReference>
+  readonly srsAsync: Promise<SpatialReference>
 
   /**
  * An affine transform which maps pixel/line coordinates into georeferenced
@@ -2230,10 +2457,11 @@ export class Dataset {
  * var Ygeo = GT[3] + Xpixel*GT[4] + Yline*GT[5];```
  *
  * {{async_getter}}
+ * @readOnly
  * @attribute geoTransformAsync
  * @type {Promise<number[]>}
  */
-  geoTransformAsync: Promise<number[]>
+  readonly geoTransformAsync: Promise<number[]>
 
   /**
  * @readOnly
@@ -2553,7 +2781,7 @@ export class DatasetBands implements Iterable<RasterBand>, AsyncIterable<RasterB
   countAsync(callback?: callback<number>): Promise<number>
 
   /**
- * Iterates through raster bands arrays using a callback function and builds
+ * Iterates through raster bands using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -2763,7 +2991,7 @@ export class DatasetLayers implements Iterable<Layer>, AsyncIterable<Layer> {
   forEach(callback: forEachCb<Layer>): void
 
   /**
- * Iterates through layers arrays using a callback function and builds
+ * Iterates through layers using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -2896,11 +3124,12 @@ export class Driver {
  * @param {string} filename
  * @param {gdal.Dataset} src
  * @param {string[]|object} [options=null] An array or object containing driver-specific dataset creation options
- * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}
  * @param {boolean} [strict=false] strict mode
+ * @param {CreateOptions} [jsoptions] additional options
+ * @param {ProgressCb} [jsoptions.progress_cb] {{{progress_cb}}}
  * @return {gdal.Dataset}
  */
-  createCopy(filename: string, src: Dataset, options?: string[]|object, progress_cb?: ProgressCb, strict?: boolean): Dataset
+  createCopy(filename: string, src: Dataset, options?: string[]|object, strict?: boolean, jsoptions?: CreateOptions): Dataset
 
   /**
  * Asynchronously create a copy of a dataset.
@@ -2910,12 +3139,13 @@ export class Driver {
  * @param {string} filename
  * @param {gdal.Dataset} src
  * @param {string[]|object} [options=null] An array or object containing driver-specific dataset creation options
- * @param {ProgressCb} [progress_cb=undefined] {{{progress_cb}}}. When specified in Promise mode, strict must also be present or progress_cb will be interpreted as a result callback.
  * @param {boolean} [strict=false] strict mode
+ * @param {CreateOptions} [jsoptions] additional options
+ * @param {ProgressCb} [jsoptions.progress_cb] {{{progress_cb}}}
  * @param {callback<gdal.Dataset>} [callback=undefined] {{{cb}}}
  * @return {Promise<gdal.Dataset>}
  */
-  createCopyAsync(filename: string, src: Dataset, options?: string[]|object, progress_cb?: ProgressCb, strict?: boolean, callback?: callback<Dataset>): Promise<Dataset>
+  createCopyAsync(filename: string, src: Dataset, options?: string[]|object, strict?: boolean, jsoptions?: CreateOptions, callback?: callback<Dataset>): Promise<Dataset>
 
   /**
  * Copy the files of a dataset.
@@ -3441,7 +3671,7 @@ export class FeatureDefnFields implements Iterable<FieldDefn>, AsyncIterable<Fie
   forEach(callback: forEachCb<FieldDefn>): void
 
   /**
- * Iterates through field definitions arrays using a callback function and builds
+ * Iterates through field definitions using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -3586,7 +3816,7 @@ export class FeatureFields {
   getNames(): string[]
 
   /**
- * Iterates through field definitions arrays using a callback function and builds
+ * Iterates through field definitions using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -3731,7 +3961,7 @@ export class GDALDrivers implements Iterable<Driver> {
   forEach(callback: forEachCb<Driver>): void
 
   /**
- * Iterates through drivers arrays using a callback function and builds
+ * Iterates through drivers using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -4803,7 +5033,7 @@ export class GeometryCollectionChildren implements Iterable<Geometry> {
  * Removes the geometry at the specified index.
  *
  * @method remove
- * @param {number} index 0-based index
+ * @param {number} index 0-based index, -1 for all geometries
  */
   remove(index: number): void
 
@@ -4840,7 +5070,7 @@ export class GeometryCollectionChildren implements Iterable<Geometry> {
   forEach(callback: forEachCb<Geometry>): void
 
   /**
- * Iterates through child geometries arrays using a callback function and builds
+ * Iterates through child geometries using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -4982,7 +5212,7 @@ export class GroupArrays implements Iterable<MDArray>, AsyncIterable<MDArray> {
   forEach(callback: forEachCb<MDArray>): void
 
   /**
- * Iterates through arrays arrays using a callback function and builds
+ * Iterates through arrays using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -5080,7 +5310,7 @@ export class GroupAttributes implements Iterable<Attribute>, AsyncIterable<Attri
   forEach(callback: forEachCb<Attribute>): void
 
   /**
- * Iterates through attributes arrays using a callback function and builds
+ * Iterates through attributes using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -5181,7 +5411,7 @@ export class GroupDimensions implements Iterable<Dimension>, AsyncIterable<Dimen
   forEach(callback: forEachCb<Dimension>): void
 
   /**
- * Iterates through dimensions arrays using a callback function and builds
+ * Iterates through dimensions using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -5280,7 +5510,7 @@ export class GroupGroups implements Iterable<Group>, AsyncIterable<Group> {
   forEach(callback: forEachCb<Group>): void
 
   /**
- * Iterates through groups arrays using a callback function and builds
+ * Iterates through groups using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -5659,7 +5889,7 @@ export class LayerFeatures implements Iterable<Feature>, AsyncIterable<Feature> 
   removeAsync(id: number, callback?: callback<void>): Promise<void>
 
   /**
- * Iterates through features arrays using a callback function and builds
+ * Iterates through features using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -5790,7 +6020,7 @@ export class LayerFields implements Iterable<FieldDefn>, AsyncIterable<FieldDefn
   forEach(callback: forEachCb<FieldDefn>): void
 
   /**
- * Iterates through field definitions arrays using a callback function and builds
+ * Iterates through field definitions using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -5943,7 +6173,7 @@ export class LineStringPoints implements Iterable<Point> {
   forEach(callback: forEachCb<Point>): void
 
   /**
- * Iterates through points arrays using a callback function and builds
+ * Iterates through points using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -6359,7 +6589,7 @@ export class PolygonRings implements Iterable<LineString> {
   forEach(callback: forEachCb<LineString>): void
 
   /**
- * Iterates through rings arrays using a callback function and builds
+ * Iterates through rings using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -6422,6 +6652,14 @@ export class RasterBand {
   readonly id: number|null
 
   /**
+ * @readOnly
+ * @attribute idAsync
+ * @type {Promise<number|null>}
+ * {{{async_getter}}}
+ */
+  readonly idAsync: Promise<number|null>
+
+  /**
  * Name of of band.
  *
  * @readOnly
@@ -6429,6 +6667,16 @@ export class RasterBand {
  * @type {string}
  */
   readonly description: string
+
+  /**
+ * Name of of band.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute descriptionAsync
+ * @type {Promise<string>}
+ */
+  readonly descriptionAsync: Promise<string>
 
   /**
  * Size object containing `"x"` and `"y"` properties.
@@ -6441,12 +6689,32 @@ export class RasterBand {
 
   /**
  * Size object containing `"x"` and `"y"` properties.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute sizeAsync
+ * @type {Promise<xyz>}
+ */
+  readonly sizeAsync: Promise<xyz>
+
+  /**
+ * Size object containing `"x"` and `"y"` properties.
  *
  * @readOnly
  * @attribute blockSize
  * @type {xyz}
  */
   readonly blockSize: xyz
+
+  /**
+ * Size object containing `"x"` and `"y"` properties.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute blockSizeAsync
+ * @type {Promise<xyz>}
+ */
+  readonly blockSizeAsync: Promise<xyz>
 
   /**
  * Minimum value for this band.
@@ -6458,6 +6726,16 @@ export class RasterBand {
   readonly minimum: number
 
   /**
+ * Minimum value for this band.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute minimumAsync
+ * @type {Promise<number>}
+ */
+  readonly minimumAsync: Promise<number>
+
+  /**
  * Maximum value for this band.
  *
  * @readOnly
@@ -6465,6 +6743,16 @@ export class RasterBand {
  * @type {number}
  */
   readonly maximum: number
+
+  /**
+ * Maximum value for this band.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute maximumAsync
+ * @type {Promise<number>}
+ */
+  readonly maximumAsync: Promise<number>
 
   /**
  * Raster value offset.
@@ -6475,6 +6763,16 @@ export class RasterBand {
   offset: number
 
   /**
+ * Raster value offset.
+ * {{{async_getter}}}
+ *
+ * @attribute offsetAsync
+ * @readOnly
+ * @type {Promise<number>}
+ */
+  readonly offsetAsync: Promise<number>
+
+  /**
  * Raster value scale.
  *
  * @attribute scale
@@ -6483,12 +6781,32 @@ export class RasterBand {
   scale: number
 
   /**
+ * Raster value scale.
+ * {{{async_getter}}}
+ *
+ * @attribute scaleAsync
+ * @readOnly
+ * @type {Promise<number>}
+ */
+  readonly scaleAsync: Promise<number>
+
+  /**
  * No data value for this band.
  *
  * @attribute noDataValue
  * @type {number|null}
  */
   noDataValue: number|null
+
+  /**
+ * No data value for this band.
+ * {{{async_getter}}}
+ *
+ * @attribute noDataValueAsync
+ * @readOnly
+ * @type {Promise<number|null>}
+ */
+  readonly noDataValueAsync: Promise<number|null>
 
   /**
  * Raster unit type (name for the units of this raster's values).
@@ -6502,6 +6820,19 @@ export class RasterBand {
   unitType: string
 
   /**
+ * Raster unit type (name for the units of this raster's values).
+ * For instance, it might be `"m"` for an elevation model in meters,
+ * or `"ft"` for feet. If no units are available, a value of `""`
+ * will be returned.
+ * {{{async_getter}}}
+ *
+ * @attribute unitTypeAsync
+ * @readOnly
+ * @type {Promise<string>}
+ */
+  readonly unitTypeAsync: Promise<string>
+
+  /**
  *
  * Pixel data type ({{#crossLink "Constants (GDT)"}}see GDT
  * constants{{/crossLink}}) used for this band.
@@ -6513,6 +6844,18 @@ export class RasterBand {
   readonly dataType: string|undefined
 
   /**
+ *
+ * Pixel data type ({{#crossLink "Constants (GDT)"}}see GDT
+ * constants{{/crossLink}}) used for this band.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute dataTypeAsync
+ * @type {Promise<string|undefined>}
+ */
+  readonly dataTypeAsync: Promise<string|undefined>
+
+  /**
  * Indicates if the band is read-only.
  *
  * @readOnly
@@ -6520,6 +6863,16 @@ export class RasterBand {
  * @type {boolean}
  */
   readonly readOnly: boolean
+
+  /**
+ * Indicates if the band is read-only.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute readOnlyAsync
+ * @type {Promise<boolean>}
+ */
+  readonly readOnlyAsync: Promise<boolean>
 
   /**
  * An indicator if the underlying datastore can compute arbitrary overviews
@@ -6535,12 +6888,36 @@ export class RasterBand {
   readonly hasArbitraryOverviews: boolean
 
   /**
+ * An indicator if the underlying datastore can compute arbitrary overviews
+ * efficiently, such as is the case with OGDI over a network. Datastores with
+ * arbitrary overviews don't generally have any fixed overviews, but GDAL's
+ * `RasterIO()` method can be used in downsampling mode to get overview
+ * data efficiently.
+ * {{{async_getter}}}
+ *
+ * @readOnly
+ * @attribute hasArbitraryOverviewsAsync
+ * @type {Promise<boolean>}
+ */
+  readonly hasArbitraryOverviewsAsync: Promise<boolean>
+
+  /**
  * List of list of category names for this raster.
  *
  * @attribute categoryNames
  * @type {string[]}
  */
   categoryNames: string[]
+
+  /**
+ * List of list of category names for this raster.
+ * {{{async_getter}}}
+ *
+ * @attribute categoryNamesAsync
+ * @readOnly
+ * @type {Promise<string[]>}
+ */
+  readonly categoryNamesAsync: Promise<string[]>
 
   /**
  * Color interpretation mode ({{#crossLink "Constants (GCI)"}}see GCI
@@ -6550,6 +6927,35 @@ export class RasterBand {
  * @type {string}
  */
   colorInterpretation: string
+
+  /**
+ * Color interpretation mode ({{#crossLink "Constants (GCI)"}}see GCI
+ * constants{{/crossLink}}).
+ * {{{async_getter}}}
+ *
+ * @attribute colorInterpretationAsync
+ * @readOnly
+ * @type {Promise<string>}
+ */
+  readonly colorInterpretationAsync: Promise<string>
+
+  /**
+ * Color table ({{#crossLink "ColorTable"}}see gdal.ColorTable{{/crossLink}}).
+ *
+ * @attribute colorTable
+ * @type {gdal.ColorTable}
+ */
+  colorTable: ColorTable
+
+  /**
+ * Color table ({{#crossLink "ColorTable"}}see gdal.ColorTable{{/crossLink}}).
+ * {{{async_getter}}}
+ *
+ * @attribute colorTableAsync
+ * @readOnly
+ * @type {Promise<gdal.ColorTable>}
+ */
+  readonly colorTableAsync: Promise<ColorTable>
 
   /**
  * Saves changes to disk.
@@ -6850,7 +7256,7 @@ export class RasterBandOverviews implements Iterable<RasterBand>, AsyncIterable<
   forEach(callback: forEachCb<RasterBand>): void
 
   /**
- * Iterates through overviews arrays using a callback function and builds
+ * Iterates through overviews using a callback function and builds
  * an array of the returned values.
  *
  * @example
@@ -7075,6 +7481,111 @@ export class RasterBandPixels {
  * @return {Promise<void>}
  */
   writeBlockAsync(x: number, y: number, data: TypedArray, callback?: callback<void>): Promise<void>
+
+  /**
+ * Clamp the block size for a given block offset.
+ * Handles partial blocks at the edges of the raster and returns the true number of pixels.
+ *
+ * @method clampBlock
+ * @throws Error
+ * @param {number} x
+ * @param {number} y
+ * @return {xyz} A size object.
+ */
+  clampBlock(x: number, y: number): xyz
+
+  /**
+ * Clamp the block size for a given block offset.
+ * Handles partial blocks at the edges of the raster and returns the true number of pixels.
+ * {{{async}}}
+ *
+ * @method clampBlockAsync
+ * @throws Error
+ * @param {number} x
+ * @param {number} y
+ * @param {callback<xyz>} [callback=undefined] {{{cb}}}
+ * @return {Promise<xyz>} A size object.
+ */
+  clampBlockAsync(x: number, y: number, callback?: callback<xyz>): Promise<xyz>
+
+  /**
+ * create a Readable stream from a raster band
+ *
+ * @for gdal.RasterBandPixels
+ * @method createReadStream
+ * @param {RasterReadableOptions} [options]
+ * @param {bool} [options.blockOptimize=true] Read by file blocks when possible (when rasterSize.x == blockSize.x)
+ * @returns {RasterReadStream}
+ */
+  createReadStream(options?: RasterReadableOptions): RasterReadStream
+
+  /**
+ * create a Writable stream from a raster band
+ *
+ * @for gdal.RasterBandPixels
+ * @method createWriteStream
+ * @param {RasterWritableOptions} [options]
+ * @param {bool} [options.blockOptimize=true] Write by file blocks when possible (when rasterSize.x == blockSize.x)
+ * @param {bool} [options.ignoreShape=false] Do not throw if the shape does not match the source
+ * @returns {RasterWriteStream}
+ */
+  createWriteStream(options?: RasterWritableOptions): RasterWriteStream
+}
+
+export class RasterMuxStream extends stream.Readable {
+/**
+ * Multiplexer stream
+ *
+ * Reads multiple input streams and outputs a single
+ * synchronized stream with multiple data elements
+ *
+ * All the input streams must have the same length
+ *
+ * @class RasterMuxStream
+ * @extends stream.Readable
+ * @param {Record<string,RasterReadStream>} inputs Input streams
+ * @param {RasterReadableOptions} [options]
+ * @param {bool} [options.blockOptimize=true] Read by file blocks when possible (when rasterSize.x == blockSize.x)
+ */
+  constructor(inputs: Record<string,RasterReadStream>, options?: RasterReadableOptions)
+}
+
+export class RasterReadStream extends stream.Readable {
+/**
+ * Class implementing raster reading as a stream of pixels
+ * Reading is buffered and it is aligned on the underlying
+ * compression blocks for maximum efficiency when possible
+ *
+ * Pixel coordinates are lost, but the row-major order is guaranteed
+ *
+ * @class RasterReadStream
+ * @extends stream.Readable
+ * @param {RasterReadableOptions} [options]
+ * @param {RasterBand} options.band RasterBand to use
+ * @param {bool} [options.blockOptimize=true] Read by file blocks when possible (when rasterSize.x == blockSize.x)
+ */
+  constructor(options?: RasterReadableOptions)
+}
+
+export class RasterWriteStream extends stream.Writable {
+/**
+ * Class implementing raster writing as a stream of pixels
+ * Writing is buffered and it is aligned on the underlying
+ * compression blocks for maximum efficiency when possible
+ *
+ * When piping between rasters using identical blocks,
+ * the transfer is zero-copy
+ *
+ * The input stream must be in row-major order
+ *
+ * @class RasterWriteStream
+ * @extends stream.Writable
+ * @param {RasterWritableOptions} [options]
+ * @param {RasterBand} options.band RasterBand to use
+ * @param {bool} [options.blockOptimize=true] Write by file blocks when possible (when rasterSize.x == blockSize.x)
+ * @param {bool} [options.ignoreShape=false] Do not throw if the shape does not match the source
+ */
+  constructor(options?: RasterWritableOptions)
 }
 
 export class SimpleCurve extends Geometry {

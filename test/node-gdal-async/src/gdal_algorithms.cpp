@@ -17,14 +17,6 @@ void Algorithms::Initialize(Local<Object> target) {
 }
 
 /**
- * @typedef FillOptions
- * @property {gdal.RasterBand} src
- * @property {gdal.RasterBand} [mask]
- * @property {number} searchDist
- * @property {number} [smoothingIterations]
- */
-
-/**
  * Fill raster regions by interpolation from edges.
  *
  * @throws Error
@@ -56,8 +48,6 @@ void Algorithms::Initialize(Local<Object> target) {
  */
 
 GDAL_ASYNCABLE_DEFINE(Algorithms::fillNodata) {
-  Nan::HandleScope scope;
-
   Local<Object> obj;
   RasterBand *src;
   RasterBand *mask = NULL;
@@ -89,19 +79,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::fillNodata) {
   job.rval = [](CPLErr r, GetFromPersistentFunc) { return Nan::Undefined().As<Value>(); };
   job.run(info, async, 1);
 }
-
-/**
- * @typedef ContourOptions
- * @property {gdal.RasterBand} src
- * @property {gdal.Layer} dst
- * @property {number} [offset]
- * @property {number} [interval]
- * @property {number[]} [fixedLevels]
- * @property {number} [nodata]
- * @property {number} [idField]
- * @property {number} [elevField]
- * @property {ProgressCb} [progress_cb]
- */
 
 /**
  * Create vector contours from raster DEM.
@@ -154,8 +131,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::fillNodata) {
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(Algorithms::contourGenerate) {
-  Nan::HandleScope scope;
-
   Local<Object> obj;
   Local<Value> prop;
   RasterBand *src;
@@ -237,16 +212,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::contourGenerate) {
 }
 
 /**
- * @typedef SieveOptions
- * @property {gdal.RasterBand} src
- * @property {gdal.RasterBand} dst
- * @property {gdal.RasterBand} [mask]
- * @property {number} threshold
- * @property {number} [connectedness]
- * @property {ProgressCb} [progress_cb]
- */
-
-/**
  * Removes small raster polygons.
  *
  * @throws Error
@@ -281,8 +246,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::contourGenerate) {
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(Algorithms::sieveFilter) {
-  Nan::HandleScope scope;
-
   Local<Object> obj;
   RasterBand *src;
   RasterBand *dst;
@@ -366,8 +329,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::sieveFilter) {
  */
 
 GDAL_ASYNCABLE_DEFINE(Algorithms::checksumImage) {
-  Nan::HandleScope scope;
-
   RasterBand *src;
   int x = 0, y = 0, w, h, bandw, bandh;
 
@@ -408,17 +369,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::checksumImage) {
   job.rval = [](int r, GetFromPersistentFunc) { return Nan::New<Integer>(r); };
   job.run(info, async, 5);
 }
-
-/**
- * @typedef PolygonizeOptions
- * @property {gdal.RasterBand} src
- * @property {gdal.Layer} dst
- * @property {gdal.RasterBand} [mask]
- * @property {number} pixValField
- * @property {number} [connectedness]
- * @property {boolean} [useFloats]
- * @property {ProgressCb} [progress_cb]
- */
 
 /**
  * Creates vector polygons for all connected regions of pixels in the raster
@@ -462,8 +412,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::checksumImage) {
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(Algorithms::polygonize) {
-  Nan::HandleScope scope;
-
   Local<Object> obj;
   RasterBand *src;
   RasterBand *mask = NULL;
@@ -541,7 +489,6 @@ GDAL_ASYNCABLE_DEFINE(Algorithms::polygonize) {
 // This is used for stress-testing the locking mechanism
 // it doesn't do anything but sollicit locks
 GDAL_ASYNCABLE_DEFINE(Algorithms::_acquireLocks) {
-  Nan::HandleScope scope;
   Dataset *ds1, *ds2, *ds3;
 
   NODE_ARG_WRAPPED(0, "ds1", Dataset, ds1);

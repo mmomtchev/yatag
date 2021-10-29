@@ -216,7 +216,7 @@ for (const typeName of Object.keys(root.children).filter((n) => n.startsWith('ty
 
 for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('interface#')).sort()) {
     const defn = root.children[ifName];
-    output.write(expandType(defn, `export interface ${defn.name} `));
+    output.write(expandType(defn, `export interface ${defn.name}${defn.extends ? ` extends ${defn.extends}` : ''} `));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {
@@ -247,7 +247,7 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
                 iterables.push(`AsyncIterable<${mangle(klass.children['asyncIterator#'].type) || 'any'}>`);
             output.write(` implements ${iterables.join(', ')}`);
         }
-        output.write(` {\n${klass.description}\n`);
+        output.write(` {\n${klass.description || ''}\n`);
         if (!config.augmentation)
             output.write(`  constructor(${expandParams(klass.children)})\n`);
         for (const prop of Object.keys(klass.children).filter((n) => n.startsWith('property#'))) {

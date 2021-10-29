@@ -105,6 +105,7 @@
 #include "collections/compound_curves.hpp"
 #include "collections/rasterband_overviews.hpp"
 #include "collections/rasterband_pixels.hpp"
+#include "collections/colortable.hpp"
 
 // std
 #include <sstream>
@@ -125,7 +126,6 @@ bool eventLoopWarn = true;
  * @type {object}
  */
 static NAN_GETTER(LastErrorGetter) {
-  Nan::HandleScope scope;
 
   int errtype = CPLGetLastErrorType();
   if (errtype == CE_None) {
@@ -141,7 +141,6 @@ static NAN_GETTER(LastErrorGetter) {
 }
 
 static NAN_SETTER(LastErrorSetter) {
-  Nan::HandleScope scope;
 
   if (value->IsNull()) {
     CPLErrorReset();
@@ -152,12 +151,10 @@ static NAN_SETTER(LastErrorSetter) {
 }
 
 static NAN_GETTER(EventLoopWarningGetter) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New<Boolean>(eventLoopWarn));
 }
 
 static NAN_SETTER(EventLoopWarningSetter) {
-  Nan::HandleScope scope;
   if (!value->IsBoolean()) {
     Nan::ThrowError("'eventLoopWarning' must be a boolean value");
     return;
@@ -188,7 +185,6 @@ static NAN_GC_CALLBACK(afterGC) {
 #endif
 
 static NAN_METHOD(StartLogging) {
-  Nan::HandleScope scope;
 
 #ifdef ENABLE_LOGGING
   std::string filename = "";
@@ -226,7 +222,6 @@ static NAN_METHOD(StopLogging) {
 }
 
 static NAN_METHOD(Log) {
-  Nan::HandleScope scope;
   std::string msg;
   NODE_ARG_STR(0, "message", msg);
   msg = msg + "\n";
@@ -246,7 +241,6 @@ static NAN_METHOD(Log) {
  */
 GDAL_ASYNCABLE_GLOBAL(gdal_open);
 GDAL_ASYNCABLE_DEFINE(gdal_open) {
-  Nan::HandleScope scope;
 
   std::string path;
   std::string mode = "r";
@@ -285,7 +279,6 @@ GDAL_ASYNCABLE_DEFINE(gdal_open) {
 }
 
 static NAN_METHOD(setConfigOption) {
-  Nan::HandleScope scope;
 
   std::string name;
 
@@ -309,7 +302,6 @@ static NAN_METHOD(setConfigOption) {
 }
 
 static NAN_METHOD(getConfigOption) {
-  Nan::HandleScope scope;
 
   std::string name;
   NODE_ARG_STR(0, "name", name);
@@ -330,7 +322,6 @@ static NAN_METHOD(getConfigOption) {
  * N or E
  */
 static NAN_METHOD(decToDMS) {
-  Nan::HandleScope scope;
 
   double angle;
   std::string axis;
@@ -357,7 +348,6 @@ static NAN_METHOD(decToDMS) {
  * @param {string} Path `c:\ProjData`
  */
 static NAN_METHOD(setPROJSearchPath) {
-  Nan::HandleScope scope;
   std::string path;
 
   NODE_ARG_STR(0, "path", path);
@@ -374,7 +364,6 @@ static NAN_METHOD(ThrowDummyCPLError) {
 }
 
 static NAN_METHOD(isAlive) {
-  Nan::HandleScope scope;
 
   long uid;
   NODE_ARG_INT(0, "uid", uid);
@@ -425,6 +414,7 @@ static void Init(Local<Object> target, Local<v8::Value>, void *) {
 
   SpatialReference::Initialize(target);
   CoordinateTransformation::Initialize(target);
+  ColorTable::Initialize(target);
 
   DatasetBands::Initialize(target);
   DatasetLayers::Initialize(target);
@@ -1088,6 +1078,44 @@ static void Init(Local<Object> target, Local<v8::Value>, void *) {
     target,
     Nan::New("GCI_YCbCr_CrBand").ToLocalChecked(),
     Nan::New(GDALGetColorInterpretationName(GCI_YCbCr_CrBand)).ToLocalChecked());
+
+  /**
+   * Palette types.
+   *
+   * @class Constants (GPI)
+   */
+
+  /**
+   * Grayscale, only c1 defined
+   * @final
+   * @property gdal.GPI_Gray
+   * @type {string}
+   */
+  Nan::Set(target, Nan::New("GPI_Gray").ToLocalChecked(), Nan::New("Gray").ToLocalChecked());
+
+  /**
+   * RGBA, alpha in c4
+   * @final
+   * @property gdal.GPI_RGB
+   * @type {string}
+   */
+  Nan::Set(target, Nan::New("GPI_RGB").ToLocalChecked(), Nan::New("RGB").ToLocalChecked());
+
+  /**
+   * CMYK
+   * @final
+   * @property gdal.GPI_CMYK
+   * @type {string}
+   */
+  Nan::Set(target, Nan::New("GPI_CMYK").ToLocalChecked(), Nan::New("CMYK").ToLocalChecked());
+
+  /**
+   * HLS, c4 is not defined
+   * @final
+   * @property gdal.GPI_HLS
+   * @type {string}
+   */
+  Nan::Set(target, Nan::New("GPI_HLS").ToLocalChecked(), Nan::New("HLS").ToLocalChecked());
 
   /**
    * @class Constants (wkbVariant)

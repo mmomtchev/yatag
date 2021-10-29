@@ -71,7 +71,6 @@ void MDArray::dispose() {
  * @class gdal.MDArray
  */
 NAN_METHOD(MDArray::New) {
-  Nan::HandleScope scope;
 
   if (!info.IsConstructCall()) {
     Nan::ThrowError("Cannot call constructor as function, you need to use 'new' keyword");
@@ -139,19 +138,8 @@ Local<Value> MDArray::New(std::shared_ptr<GDALMDArray> raw, GDALDataset *parent_
 }
 
 NAN_METHOD(MDArray::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("MDArray").ToLocalChecked());
 }
-
-/**
- * @typedef MDArrayOptions
- * @property {number[]} origin
- * @property {number[]} span
- * @property {number[]} [stride]
- * @property {string} [data_type]
- * @property {TypedArray} [data]
- * @property {number} [_offset]
- */
 
 /* Find the lowest possible element index for the given spans and strides */
 static inline int
@@ -250,7 +238,6 @@ findHighest(int dimensions, std::shared_ptr<size_t> span, std::shared_ptr<GPtrDi
  * @return {Promise<TypedArray>} A TypedArray (https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView#Typed_array_subclasses) of values.
  */
 GDAL_ASYNCABLE_DEFINE(MDArray::read) {
-  Nan::HandleScope scope;
 
   NODE_UNWRAP_CHECK(MDArray, info.This(), self);
 
@@ -364,7 +351,6 @@ GDAL_ASYNCABLE_DEFINE(MDArray::read) {
  * @return {gdal.MDArray}
  */
 NAN_METHOD(MDArray::getView) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_RAW_CHECK(std::shared_ptr<GDALMDArray>, array, raw);
 
@@ -393,7 +379,6 @@ NAN_METHOD(MDArray::getView) {
  * @return {gdal.MDArray}
  */
 NAN_METHOD(MDArray::getMask) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_RAW_CHECK(std::shared_ptr<GDALMDArray>, array, raw);
 
@@ -420,7 +405,6 @@ NAN_METHOD(MDArray::getMask) {
  * @return {gdal.Dataset}
  */
 NAN_METHOD(MDArray::asDataset) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_RAW_CHECK(std::shared_ptr<GDALMDArray>, array, raw);
 
@@ -450,7 +434,6 @@ NAN_METHOD(MDArray::asDataset) {
  * @type {gdal.SpatialReference}
  */
 NAN_GETTER(MDArray::srsGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_RAW_CHECK(std::shared_ptr<GDALMDArray>, array, raw);
   GDAL_LOCK_PARENT(array);
@@ -470,7 +453,6 @@ NAN_GETTER(MDArray::srsGetter) {
  * @type {number}
  */
 NAN_GETTER(MDArray::offsetGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   bool hasOffset = false;
   GDAL_LOCK_PARENT(array);
@@ -488,7 +470,6 @@ NAN_GETTER(MDArray::offsetGetter) {
  * @type {number}
  */
 NAN_GETTER(MDArray::scaleGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   bool hasScale = false;
   GDAL_LOCK_PARENT(array);
@@ -506,7 +487,6 @@ NAN_GETTER(MDArray::scaleGetter) {
  * @type {number|null}
  */
 NAN_GETTER(MDArray::noDataValueGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   bool hasNoData = false;
   GDAL_LOCK_PARENT(array);
@@ -531,7 +511,6 @@ NAN_GETTER(MDArray::noDataValueGetter) {
  * @type {string}
  */
 NAN_GETTER(MDArray::unitTypeGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_LOCK_PARENT(array);
   std::string unit = array->this_->GetUnit();
@@ -544,7 +523,6 @@ NAN_GETTER(MDArray::unitTypeGetter) {
  * @type {string}
  */
 NAN_GETTER(MDArray::typeGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_RAW_CHECK(std::shared_ptr<GDALMDArray>, array, raw);
   GDAL_LOCK_PARENT(array);
@@ -565,7 +543,6 @@ NAN_GETTER(MDArray::typeGetter) {
  * @type {gdal.GroupDimensions}
  */
 NAN_GETTER(MDArray::dimensionsGetter) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("dims_").ToLocalChecked()).ToLocalChecked());
 }
 
@@ -575,7 +552,6 @@ NAN_GETTER(MDArray::dimensionsGetter) {
  * @type {gdal.ArrayAttributes}
  */
 NAN_GETTER(MDArray::attributesGetter) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("attrs_").ToLocalChecked()).ToLocalChecked());
 }
 
@@ -585,7 +561,6 @@ NAN_GETTER(MDArray::attributesGetter) {
  * @type {string}
  */
 NAN_GETTER(MDArray::descriptionGetter) {
-  Nan::HandleScope scope;
   NODE_UNWRAP_CHECK(MDArray, info.This(), array);
   GDAL_RAW_CHECK(std::shared_ptr<GDALMDArray>, array, raw);
   GDAL_LOCK_PARENT(array);
@@ -603,7 +578,6 @@ NAN_GETTER(MDArray::descriptionGetter) {
 NODE_WRAPPED_GETTER_WITH_RESULT_LOCKED(MDArray, lengthGetter, Number, GetTotalElementsCount);
 
 NAN_GETTER(MDArray::uidGetter) {
-  Nan::HandleScope scope;
   MDArray *ds = Nan::ObjectWrap::Unwrap<MDArray>(info.This());
   info.GetReturnValue().Set(Nan::New((int)ds->uid));
 }

@@ -11,7 +11,7 @@ void Warper::Initialize(Local<Object> target) {
   Nan__SetAsyncableMethod(target, "suggestedWarpOutput", suggestedWarpOutput);
 }
 
-/**
+/*
  * GDALReprojectImage() method with a ChunkAndWarpImage replaced with
  * ChunkAndWarpMulti
  */
@@ -163,28 +163,6 @@ CPLErr GDALReprojectImageMulti(
 }
 
 /**
- * @typedef ReprojectOptions
- * @property {gdal.Dataset} src
- * @property {gdal.Dataset} dst
- * @property {gdal.SpatialReference} s_srs
- * @property {gdal.SpatialReference} t_srs
- * @property {string} [resampling]
- * @property {gdal.Geometry} [cutline]
- * @property {number[]} [srcBands]
- * @property {number[]} [dstBands]
- * @property {number} [srcAlphaBand]
- * @property {number} [dstAlphaBand]
- * @property {number} [srcNodata]
- * @property {number} [dstNodata]
- * @property {number} [blend]
- * @property {number} [memoryLimit]
- * @property {number} [maxError]
- * @property {boolean} [multi]
- * @property {object} [options]
- * @property {ProgressCb} [progress_cb]
- */
-
-/**
  * Reprojects a dataset.
  *
  * @throws Error
@@ -241,7 +219,6 @@ CPLErr GDALReprojectImageMulti(
  * @return {Promise<void>}
  */
 GDAL_ASYNCABLE_DEFINE(Warper::reprojectImage) {
-  Nan::HandleScope scope;
 
   Local<Object> obj;
   Local<Value> prop;
@@ -334,20 +311,6 @@ GDAL_ASYNCABLE_DEFINE(Warper::reprojectImage) {
 }
 
 /**
- * @typedef WarpOptions
- * @property {gdal.Dataset} src
- * @property {gdal.SpatialReference} s_srs
- * @property {gdal.SpatialReference} t_srs
- * @property {number} [maxError]
- */
-
-/**
- * @typedef WarpOutput
- * @property {xyz} rasterSize
- * @property {number[]} geoTransform
- */
-
-/**
  * Used to determine the bounds and resolution of the output virtual file which
  * should be large enough to include all the input image.
  *
@@ -382,7 +345,6 @@ GDAL_ASYNCABLE_DEFINE(Warper::reprojectImage) {
  * @return {Promise<WarpOutput>}
  */
 GDAL_ASYNCABLE_DEFINE(Warper::suggestedWarpOutput) {
-  Nan::HandleScope scope;
 
   Local<Object> obj;
   Local<Value> prop;
