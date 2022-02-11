@@ -32,14 +32,13 @@ void Point::Initialize(Local<Object> target) {
  * Point class.
  *
  * @constructor
- * @class gdal.Point
- * @extends gdal.Geometry
+ * @class Point
+ * @extends Geometry
  * @param {number} x
  * @param {number} y
  * @param {number} [z]
  */
 NAN_METHOD(Point::New) {
-  Nan::HandleScope scope;
   Point *f;
   OGRPoint *geom;
   double x = 0, y = 0, z = 0;
@@ -78,22 +77,22 @@ NAN_METHOD(Point::New) {
 }
 
 NAN_METHOD(Point::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("Point").ToLocalChecked());
 }
 
 /**
- * @attribute x
+ * @kind member
+ * @name x
+ * @instance
+ * @memberof Point
  * @type {number}
  */
 NAN_GETTER(Point::xGetter) {
-  Nan::HandleScope scope;
   Point *geom = Nan::ObjectWrap::Unwrap<Point>(info.This());
   info.GetReturnValue().Set(Nan::New<Number>((geom->this_)->getX()));
 }
 
 NAN_SETTER(Point::xSetter) {
-  Nan::HandleScope scope;
   Point *geom = Nan::ObjectWrap::Unwrap<Point>(info.This());
 
   if (!value->IsNumber()) {
@@ -106,17 +105,18 @@ NAN_SETTER(Point::xSetter) {
 }
 
 /**
- * @attribute y
+ * @kind member
+ * @name y
+ * @instance
+ * @memberof Point
  * @type {number}
  */
 NAN_GETTER(Point::yGetter) {
-  Nan::HandleScope scope;
   Point *geom = Nan::ObjectWrap::Unwrap<Point>(info.This());
   info.GetReturnValue().Set(Nan::New<Number>((geom->this_)->getY()));
 }
 
 NAN_SETTER(Point::ySetter) {
-  Nan::HandleScope scope;
   Point *geom = Nan::ObjectWrap::Unwrap<Point>(info.This());
 
   if (!value->IsNumber()) {
@@ -129,11 +129,13 @@ NAN_SETTER(Point::ySetter) {
 }
 
 /**
- * @attribute z
+ * @kind member
+ * @name z
+ * @instance
+ * @memberof Point
  * @type {number}
  */
 NAN_GETTER(Point::zGetter) {
-  Nan::HandleScope scope;
   Point *geom = Nan::ObjectWrap::Unwrap<Point>(info.This());
   info.GetReturnValue().Set(Nan::New<Number>((geom->this_)->getZ()));
 }

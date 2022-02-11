@@ -32,10 +32,10 @@ GDALDrivers::~GDALDrivers() {
 }
 
 /**
- * An collection of all {{#crossLink "gdal.Driver"}}drivers{{/crossLink}}
+ * An collection of all {@link Driver}
  * registered with GDAL.
  *
- * @class gdal.GDALDrivers
+ * @class GDALDrivers
  */
 NAN_METHOD(GDALDrivers::New) {
 
@@ -80,9 +80,11 @@ NAN_METHOD(GDALDrivers::toString) {
  * fetch the raster VRT driver.
  *
  * @method get
+ * @instance
+ * @memberof GDALDrivers
  * @param {number|string} index 0-based index or driver name
  * @throws Error
- * @return {gdal.Driver}
+ * @return {Driver}
  */
 NAN_METHOD(GDALDrivers::get) {
 
@@ -129,6 +131,8 @@ NAN_METHOD(GDALDrivers::get) {
  * Returns an array with the names of all the drivers registered with GDAL.
  *
  * @method getNames
+ * @instance
+ * @memberof GDALDrivers
  * @return {string[]}
  */
 NAN_METHOD(GDALDrivers::getNames) {
@@ -153,6 +157,8 @@ NAN_METHOD(GDALDrivers::getNames) {
  * Returns the number of drivers registered with GDAL.
  *
  * @method count
+ * @instance
+ * @memberof GDALDrivers
  * @return {number}
  */
 NAN_METHOD(GDALDrivers::count) {

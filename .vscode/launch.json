@@ -25,7 +25,19 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/yatag.js"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Launch Queue",
+            "cwd": "${workspaceFolder}/test/Queue/",
+            "args": [
+                "-v"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/yatag.js"
         }
-
     ]
 }

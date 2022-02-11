@@ -48,16 +48,15 @@ void ColorTable::dispose() {
   }
 }
 /**
- * An encapsulation of a {{#crossLink "gdal.RasterBand"}}RasterBand{{/crossLink}}'s
+ * An encapsulation of a {@link RasterBand}
  * color table.
  *
- * ```
+ * @example
  * var colorTable = band.colorTable;
  *
  * band.colorTable = new gdal.ColorTable(gdal.GPI_RGB);
- * ```
  *
- * @class gdal.ColorTable
+ * @class ColorTable
  * @param {string} interpretation palette interpretation
  */
 NAN_METHOD(ColorTable::New) {
@@ -141,11 +140,22 @@ NAN_METHOD(ColorTable::toString) {
 }
 
 /**
+ * @typedef {object} Color
+ * @memberof ColorTable
+ * @property {number} c1
+ * @property {number} c2
+ * @property {number} c3
+ * @property {number} c4
+ */
+
+/**
  * Clones the instance.
  * The newly created ColorTable is not owned by any RasterBand.
  *
  * @method clone
- * @return {gdal.ColorTable}
+ * @instance
+ * @memberof ColorTable
+ * @return {ColorTable}
  */
 NAN_METHOD(ColorTable::clone) {
   ColorTable *ct = Nan::ObjectWrap::Unwrap<ColorTable>(info.This());
@@ -156,7 +166,9 @@ NAN_METHOD(ColorTable::clone) {
  * Compares two ColorTable objects for equality
  *
  * @method isSame
- * @param {gdal.ColorTable} other
+ * @instance
+ * @memberof ColorTable
+ * @param {ColorTable} other
  * @throws Error
  * @return {boolean}
  */
@@ -177,6 +189,8 @@ NAN_METHOD(ColorTable::isSame) {
  * Returns the color with the given ID.
  *
  * @method get
+ * @instance
+ * @memberof ColorTable
  * @param {number} index
  * @throws Error
  * @return {Color}
@@ -220,6 +234,8 @@ NAN_METHOD(ColorTable::get) {
  * Sets the color entry with the given ID.
  *
  * @method set
+ * @instance
+ * @memberof ColorTable
  * @throws Error
  * @param {number} index
  * @param {Color} color
@@ -254,6 +270,8 @@ NAN_METHOD(ColorTable::set) {
  * Creates a color ramp from one color entry to another.
  *
  * @method ramp
+ * @instance
+ * @memberof ColorTable
  * @throws Error
  * @param {number} start_index
  * @param {Color} start_color
@@ -302,6 +320,8 @@ NAN_METHOD(ColorTable::ramp) {
  * Returns the number of color entries.
  *
  * @method count
+ * @instance
+ * @memberof ColorTable
  * @return {number}
  */
 NAN_METHOD(ColorTable::count) {
@@ -322,8 +342,11 @@ NAN_METHOD(ColorTable::count) {
 /**
  * Color interpretation of the palette
  *
- * @readOnly
- * @attribute interpretation
+ * @readonly
+ * @kind member
+ * @name interpretation
+ * @instance
+ * @memberof ColorTable
  * @type {string}
  */
 NAN_GETTER(ColorTable::interpretationGetter) {
@@ -353,9 +376,12 @@ NAN_GETTER(ColorTable::interpretationGetter) {
 /**
  * Parent band
  *
- * @readOnly
- * @attribute band
- * @type {gdal.RasterBand|undefined}
+ * @readonly
+ * @kind member
+ * @name band
+ * @instance
+ * @memberof ColorTable
+ * @type {RasterBand|undefined}
  */
 NAN_GETTER(ColorTable::bandGetter) {
   MaybeLocal<Value> parentMaybe = Nan::GetPrivate(info.This(), Nan::New("parent_").ToLocalChecked());

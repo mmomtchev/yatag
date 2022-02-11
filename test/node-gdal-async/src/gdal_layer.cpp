@@ -73,7 +73,7 @@ void Layer::dispose() {
 /**
  * A representation of a layer of simple vector features, with access methods.
  *
- * @class gdal.Layer
+ * @class Layer
  */
 NAN_METHOD(Layer::New) {
 
@@ -164,6 +164,8 @@ NAN_METHOD(Layer::toString) {
  *
  * @throws Error
  * @method flush
+ * @instance
+ * @memberof Layer
  */
 
 /**
@@ -172,6 +174,8 @@ NAN_METHOD(Layer::toString) {
  *
  * @throws Error
  * @method flushAsync
+ * @instance
+ * @memberof Layer
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<void>}
  *
@@ -182,8 +186,9 @@ NODE_WRAPPED_ASYNC_METHOD_WITH_OGRERR_RESULT_LOCKED(Layer, syncToDisk, SyncToDis
  * Determines if the dataset supports the indicated operation.
  *
  * @method testCapability
- * @param {string} capability (see {{#crossLink "Constants (OLC)"}}capability
- * list{{/crossLink}})
+ * @instance
+ * @memberof Layer
+ * @param {string} capability (see {@link OLC|capability list}
  * @return {boolean}
  */
 NODE_WRAPPED_METHOD_WITH_RESULT_1_STRING_PARAM_LOCKED(Layer, testCapability, Boolean, TestCapability, "capability");
@@ -193,8 +198,10 @@ NODE_WRAPPED_METHOD_WITH_RESULT_1_STRING_PARAM_LOCKED(Layer, testCapability, Boo
  *
  * @throws Error
  * @method getExtent
+ * @instance
+ * @memberof Layer
  * @param {boolean} [force=true]
- * @return {gdal.Envelope} Bounding envelope
+ * @return {Envelope} Bounding envelope
  */
 NAN_METHOD(Layer::getExtent) {
 
@@ -230,7 +237,9 @@ NAN_METHOD(Layer::getExtent) {
  *
  * @throws Error
  * @method getSpatialFilter
- * @return {gdal.Geometry}
+ * @instance
+ * @memberof Layer
+ * @return {Geometry}
  */
 NAN_METHOD(Layer::getSpatialFilter) {
 
@@ -254,13 +263,35 @@ NAN_METHOD(Layer::getSpatialFilter) {
  * Alernatively you can pass it envelope bounds as individual arguments.
  *
  * @example
- * ```
+ *
  * layer.setSpatialFilter(geometry);
- * layer.setSpatialFilter(minX, minY, maxX, maxY);```
  *
  * @throws Error
  * @method setSpatialFilter
- * @param {gdal.Geometry} filter
+ * @instance
+ * @memberof Layer
+ * @param {Geometry|null} filter
+ */
+
+/**
+ * This method sets the geometry to be used as a spatial filter when fetching
+ * features via the `layer.features.next()` method. Only features that
+ * geometrically intersect the filter geometry will be returned.
+ *
+ * Alernatively you can pass it envelope bounds as individual arguments.
+ *
+ * @example
+ *
+ * layer.setSpatialFilter(minX, minY, maxX, maxY);
+ *
+ * @throws Error
+ * @method setSpatialFilter
+ * @instance
+ * @memberof Layer
+ * @param {number} minxX
+ * @param {number} minyY
+ * @param {number} maxX
+ * @param {number} maxY
  */
 NAN_METHOD(Layer::setSpatialFilter) {
 
@@ -312,12 +343,14 @@ NAN_METHOD(Layer::setSpatialFilter) {
  * of OGR SQL.
  *
  * @example
- * ```
- * layer.setAttributeFilter('population > 1000000 and population < 5000000');```
+ *
+ * layer.setAttributeFilter('population > 1000000 and population < 5000000');
  *
  * @throws Error
  * @method setAttributeFilter
- * @param {string} filter
+ * @instance
+ * @memberof Layer
+ * @param {string|null} [filter=null]
  */
 NAN_METHOD(Layer::setAttributeFilter) {
 
@@ -361,18 +394,24 @@ false));
 }*/
 
 /**
- * @readOnly
- * @attribute ds
- * @type {gdal.Dataset}
+ * @readonly
+ * @kind member
+ * @name ds
+ * @instance
+ * @memberof Layer
+ * @type {Dataset}
  */
 NAN_GETTER(Layer::dsGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("ds_").ToLocalChecked()).ToLocalChecked());
 }
 
 /**
- * @readOnly
- * @attribute srs
- * @type {gdal.SpatialReference}
+ * @readonly
+ * @kind member
+ * @name srs
+ * @instance
+ * @memberof Layer
+ * @type {SpatialReference}
  */
 NAN_GETTER(Layer::srsGetter) {
   Layer *layer = Nan::ObjectWrap::Unwrap<Layer>(info.This());
@@ -386,8 +425,11 @@ NAN_GETTER(Layer::srsGetter) {
 }
 
 /**
- * @readOnly
- * @attribute name
+ * @readonly
+ * @kind member
+ * @name name
+ * @instance
+ * @memberof Layer
  * @type {string}
  */
 NAN_GETTER(Layer::nameGetter) {
@@ -402,8 +444,11 @@ NAN_GETTER(Layer::nameGetter) {
 }
 
 /**
- * @readOnly
- * @attribute geomColumn
+ * @readonly
+ * @kind member
+ * @name geomColumn
+ * @instance
+ * @memberof Layer
  * @type {string}
  */
 NAN_GETTER(Layer::geomColumnGetter) {
@@ -418,8 +463,11 @@ NAN_GETTER(Layer::geomColumnGetter) {
 }
 
 /**
- * @readOnly
- * @attribute fidColumn
+ * @readonly
+ * @kind member
+ * @name fidColumn
+ * @instance
+ * @memberof Layer
  * @type {string}
  */
 NAN_GETTER(Layer::fidColumnGetter) {
@@ -434,10 +482,12 @@ NAN_GETTER(Layer::fidColumnGetter) {
 }
 
 /**
- * @readOnly
- * @attribute geomType
- * @type {number} (see {{#crossLink "Constants (wkb)"}}geometry
- * types{{/crossLink}})
+ * @readonly
+ * @kind member
+ * @name geomType
+ * @instance
+ * @memberof Layer
+ * @type {number} (see {@link wkbGeometry|geometry types}
  */
 NAN_GETTER(Layer::geomTypeGetter) {
   Layer *layer = Nan::ObjectWrap::Unwrap<Layer>(info.This());
@@ -451,18 +501,24 @@ NAN_GETTER(Layer::geomTypeGetter) {
 }
 
 /**
- * @readOnly
- * @attribute features
- * @type {gdal.LayerFeatures}
+ * @readonly
+ * @kind member
+ * @name features
+ * @instance
+ * @memberof Layer
+ * @type {LayerFeatures}
  */
 NAN_GETTER(Layer::featuresGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("features_").ToLocalChecked()).ToLocalChecked());
 }
 
 /**
- * @readOnly
- * @attribute fields
- * @type {gdal.LayerFields}
+ * @readonly
+ * @kind member
+ * @name fields
+ * @instance
+ * @memberof Layer
+ * @type {LayerFields}
  */
 NAN_GETTER(Layer::fieldsGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("fields_").ToLocalChecked()).ToLocalChecked());

@@ -37,10 +37,10 @@ LayerFeatures::~LayerFeatures() {
 }
 
 /**
- * An encapsulation of a {{#crossLink "gdal.Layer"}}Layer{{/crossLink}}'s
+ * An encapsulation of a {@link Layer}
  * features.
  *
- * @class gdal.LayerFeatures
+ * @class LayerFeatures
  */
 NAN_METHOD(LayerFeatures::New) {
 
@@ -86,9 +86,11 @@ NAN_METHOD(LayerFeatures::toString) {
  * `next()` method.
  *
  * @method get
+ * @instance
+ * @memberof LayerFeatures
  * @param {number} id The feature ID of the feature to read.
  * @throws Error
- * @return {gdal.Feature}
+ * @return {Feature}
  */
 
 /**
@@ -100,10 +102,12 @@ NAN_METHOD(LayerFeatures::toString) {
  * {{{async}}}
  *
  * @method getAsync
+ * @instance
+ * @memberof LayerFeatures
  * @param {number} id The feature ID of the feature to read.
- * @param {callback<gdal.Feature>} [callback=undefined] {{{cb}}}
+ * @param {callback<Feature>} [callback=undefined] {{{cb}}}
  * @throws Error
- * @return {Promise<gdal.Feature>}
+ * @return {Promise<Feature>}
  */
 GDAL_ASYNCABLE_DEFINE(LayerFeatures::get) {
 
@@ -126,7 +130,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::get) {
     if (feature == nullptr) throw CPLGetLastErrorMsg();
     return feature;
   };
-  job.rval = [](OGRFeature *feature, GetFromPersistentFunc) { return Feature::New(feature); };
+  job.rval = [](OGRFeature *feature, const GetFromPersistentFunc &) { return Feature::New(feature); };
   job.run(info, async, 1);
 }
 
@@ -135,7 +139,9 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::get) {
  * returns the first feature in the layer.
  *
  * @method first
- * @return {gdal.Feature}
+ * @instance
+ * @memberof LayerFeatures
+ * @return {Feature}
  */
 
 /**
@@ -144,8 +150,10 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::get) {
  * {{{async}}}
  *
  * @method firstAsync
- * @param {callback<gdal.Feature>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Feature>}
+ * @instance
+ * @memberof LayerFeatures
+ * @param {callback<Feature>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Feature>}
  */
 GDAL_ASYNCABLE_DEFINE(LayerFeatures::first) {
 
@@ -165,7 +173,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::first) {
     OGRFeature *feature = gdal_layer->GetNextFeature();
     return feature;
   };
-  job.rval = [](OGRFeature *feature, GetFromPersistentFunc) { return Feature::New(feature); };
+  job.rval = [](OGRFeature *feature, const GetFromPersistentFunc &) { return Feature::New(feature); };
   job.run(info, async, 0);
 }
 
@@ -173,11 +181,13 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::first) {
  * Returns the next feature in the layer. Returns null if no more features.
  *
  * @example
- * ```
- * while (feature = layer.features.next()) { ... }```
+ *
+ * while (feature = layer.features.next()) { ... }
  *
  * @method next
- * @return {gdal.Feature}
+ * @instance
+ * @memberof LayerFeatures
+ * @return {Feature}
  */
 
 /**
@@ -185,12 +195,14 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::first) {
  * {{{async}}}
  *
  * @example
- * ```
- * while (feature = await layer.features.nextAsync()) { ... }```
+ *
+ * while (feature = await layer.features.nextAsync()) { ... }
  *
  * @method nextAsync
- * @param {callback<gdal.Feature>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Feature>}
+ * @instance
+ * @memberof LayerFeatures
+ * @param {callback<Feature>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Feature>}
  */
 GDAL_ASYNCABLE_DEFINE(LayerFeatures::next) {
 
@@ -209,7 +221,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::next) {
     OGRFeature *feature = gdal_layer->GetNextFeature();
     return feature;
   };
-  job.rval = [](OGRFeature *feature, GetFromPersistentFunc) { return Feature::New(feature); };
+  job.rval = [](OGRFeature *feature, const GetFromPersistentFunc &) { return Feature::New(feature); };
   job.run(info, async, 0);
 }
 
@@ -218,15 +230,17 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::next) {
  * layer as the definition.
  *
  * @example
- * ```
+ *
  * var feature = new gdal.Feature(layer);
  * feature.setGeometry(new gdal.Point(0, 1));
  * feature.fields.set('name', 'somestring');
- * layer.features.add(feature);```
+ * layer.features.add(feature);
  *
  * @method add
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
- * @param {gdal.Feature} feature
+ * @param {Feature} feature
  */
 
 /**
@@ -235,15 +249,17 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::next) {
  * {{{async}}}
  *
  * @example
- * ```
+ *
  * var feature = new gdal.Feature(layer);
  * feature.setGeometry(new gdal.Point(0, 1));
  * feature.fields.set('name', 'somestring');
- * await layer.features.addAsync(feature);```
+ * await layer.features.addAsync(feature);
  *
  * @method addAsync
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
- * @param {gdal.Feature} feature
+ * @param {Feature} feature
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<void>}
  */
@@ -270,7 +286,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::add) {
     if (err != CE_None) throw getOGRErrMsg(err);
     return err;
   };
-  job.rval = [](int, GetFromPersistentFunc) { return Nan::Undefined(); };
+  job.rval = [](int, const GetFromPersistentFunc &) { return Nan::Undefined(); };
   job.run(info, async, 1);
 }
 
@@ -278,6 +294,8 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::add) {
  * Returns the number of features in the layer.
  *
  * @method count
+ * @instance
+ * @memberof LayerFeatures
  * @param {boolean} [force=true]
  * @return {number} number of features in the layer.
  */
@@ -287,6 +305,8 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::add) {
  * {{{async}}}
  *
  * @method countAsync
+ * @instance
+ * @memberof LayerFeatures
  * @param {boolean} [force=true]
  * @param {callback<number>} [callback=undefined] {{{cb}}}
  * @return {Promise<number>} number of features in the layer.
@@ -320,7 +340,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::count) {
     GIntBig count = gdal_layer->GetFeatureCount(force);
     return count;
   };
-  job.rval = [](GIntBig count, GetFromPersistentFunc) { return Nan::New<Number>(count); };
+  job.rval = [](GIntBig count, const GetFromPersistentFunc &) { return Nan::New<Number>(count); };
   job.run(info, async, 1);
 }
 
@@ -328,17 +348,21 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::count) {
  * Sets a feature in the layer.
  *
  * @method set
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
- * @param {gdal.Feature} feature
+ * @param {Feature} feature
  */
 
 /**
  * Sets a feature in the layer.
  *
  * @method set
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
  * @param {number} id
- * @param {gdal.Feature} feature
+ * @param {Feature} feature
  */
 
 /**
@@ -346,11 +370,13 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::count) {
  * {{{async}}}
  *
  * @method setAsync
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
  * @param {number} id
- * @param {gdal.Feature} feature
- * @param {callback<gdal.Feature>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Feature>}
+ * @param {Feature} feature
+ * @param {callback<Feature>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Feature>}
  */
 GDAL_ASYNCABLE_DEFINE(LayerFeatures::set) {
 
@@ -406,7 +432,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::set) {
     return err;
   };
 
-  job.rval = [](int, GetFromPersistentFunc) { return Nan::Undefined(); };
+  job.rval = [](int, const GetFromPersistentFunc &) { return Nan::Undefined(); };
   job.run(info, async, 2);
 }
 
@@ -414,14 +440,19 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::set) {
  * Removes a feature from the layer.
  *
  * @method remove
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
  * @param {number} id
  */
 
 /**
  * Removes a feature from the layer.
+ * {{{async}}}
  *
  * @method removeAsync
+ * @instance
+ * @memberof LayerFeatures
  * @throws Error
  * @param {number} id
  * @param {callback<void>} [callback=undefined] {{{cb}}}
@@ -449,7 +480,7 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::remove) {
     if (err) { throw getOGRErrMsg(err); }
     return err;
   };
-  job.rval = [](int, GetFromPersistentFunc) { return Nan::Undefined(); };
+  job.rval = [](int, const GetFromPersistentFunc &) { return Nan::Undefined(); };
   job.run(info, async, 1);
 
   return;
@@ -458,8 +489,11 @@ GDAL_ASYNCABLE_DEFINE(LayerFeatures::remove) {
 /**
  * Parent layer
  *
- * @attribute layer
- * @type {gdal.Layer}
+ * @kind member
+ * @name layer
+ * @instance
+ * @memberof LayerFeatures
+ * @type {Layer}
  */
 NAN_GETTER(LayerFeatures::layerGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("parent_").ToLocalChecked()).ToLocalChecked());

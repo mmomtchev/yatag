@@ -33,10 +33,9 @@ CompoundCurveCurves::~CompoundCurveCurves() {
 }
 
 /**
- * A collection of connected curves, used by {{#crossLink
- * "gdal.CompoundCurve"}}gdal.CompoundCurve{{/crossLink}}.
+ * A collection of connected curves, used by {@link CompoundCurve}
  *
- * @class gdal.CompoundCurveCurves
+ * @class CompoundCurveCurves
  */
 NAN_METHOD(CompoundCurveCurves::New) {
 
@@ -79,6 +78,8 @@ NAN_METHOD(CompoundCurveCurves::toString) {
  * Returns the number of curves that exist in the collection.
  *
  * @method count
+ * @instance
+ * @memberof CompoundCurveCurves
  * @return {number}
  */
 NAN_METHOD(CompoundCurveCurves::count) {
@@ -94,14 +95,16 @@ NAN_METHOD(CompoundCurveCurves::count) {
  * Returns the curve at the specified index.
  *
  * @example
- * ```
+ *
  * var curve0 = compound.curves.get(0);
- * var curve1 = compound.curves.get(1);```
+ * var curve1 = compound.curves.get(1);
  *
  * @method get
+ * @instance
+ * @memberof CompoundCurveCurves
  * @param {number} index
  * @throws Error
- * @return {gdal.CompoundCurve|gdal.SimpleCurve}
+ * @return {gdal.CompoundCurve|SimpleCurve}
  */
 NAN_METHOD(CompoundCurveCurves::get) {
 
@@ -122,7 +125,7 @@ NAN_METHOD(CompoundCurveCurves::get) {
  * Adds a curve to the collection.
  *
  * @example
- * ```
+ *
  * var ring1 = new gdal.CircularString();
  * ring1.points.add(0,0);
  * ring1.points.add(1,0);
@@ -134,10 +137,12 @@ NAN_METHOD(CompoundCurveCurves::get) {
  * compound.curves.add(ring1);
  *
  * // many at once:
- * compound.curves.add([ring1, ...]);```
+ * compound.curves.add([ring1, ...]);
  *
  * @method add
- * @param {gdal.SimpleCurve|gdal.SimpleCurve[]} curves
+ * @instance
+ * @memberof CompoundCurveCurves
+ * @param {gdal.SimpleCurve|SimpleCurve[]} curves
  */
 NAN_METHOD(CompoundCurveCurves::add) {
 

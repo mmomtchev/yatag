@@ -62,7 +62,7 @@ void Dimension::dispose() {
 /**
  * A representation of a group with access methods.
  *
- * @class gdal.Dimension
+ * @class Dimension
  */
 NAN_METHOD(Dimension::New) {
 
@@ -125,29 +125,41 @@ NAN_METHOD(Dimension::toString) {
 }
 
 /**
- * @readOnly
- * @attribute size
+ * @readonly
+ * @kind member
+ * @name size
+ * @instance
+ * @memberof Dimension
  * @type {number}
  */
 NODE_WRAPPED_GETTER_WITH_RESULT_LOCKED(Dimension, sizeGetter, Number, GetSize);
 
 /**
- * @readOnly
- * @attribute description
+ * @readonly
+ * @kind member
+ * @name description
+ * @instance
+ * @memberof Dimension
  * @type {string}
  */
 NODE_WRAPPED_GETTER_WITH_STRING_LOCKED(Dimension, descriptionGetter, GetFullName);
 
 /**
- * @readOnly
- * @attribute direction
+ * @readonly
+ * @kind member
+ * @name direction
+ * @instance
+ * @memberof Dimension
  * @type {string}
  */
 NODE_WRAPPED_GETTER_WITH_STRING_LOCKED(Dimension, directionGetter, GetDirection);
 
 /**
- * @readOnly
- * @attribute type
+ * @readonly
+ * @kind member
+ * @name type
+ * @instance
+ * @memberof Dimension
  * @type {string}
  */
 NODE_WRAPPED_GETTER_WITH_STRING_LOCKED(Dimension, typeGetter, GetType);

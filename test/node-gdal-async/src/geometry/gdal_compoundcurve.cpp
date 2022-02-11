@@ -36,29 +36,30 @@ void CompoundCurve::SetPrivate(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE _this, v8:
  * Concrete representation of a compound contionuos curve.
  *
  * @example
- * ```
+ *
  * var CompoundCurve = new gdal.CompoundCurve();
  * CompoundCurve.points.add(new gdal.Point(0,0));
- * CompoundCurve.points.add(new gdal.Point(0,10));```
+ * CompoundCurve.points.add(new gdal.Point(0,10));
  *
  * @constructor
- * @class gdal.CompoundCurve
- * @extends gdal.Geometry
+ * @class CompoundCurve
+ * @extends Geometry
  */
 
 NAN_METHOD(CompoundCurve::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("CompoundCurve").ToLocalChecked());
 }
 
 /**
  * Points that make up the compound curve.
  *
- * @attribute curves
- * @type {gdal.CompoundCurveCurves}
+ * @kind member
+ * @name curves
+ * @instance
+ * @memberof CompoundCurve
+ * @type {CompoundCurveCurves}
  */
 NAN_GETTER(CompoundCurve::curvesGetter) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("curves_").ToLocalChecked()).ToLocalChecked());
 }
 

@@ -45,10 +45,9 @@ FieldDefn::~FieldDefn() {
 
 /**
  * @constructor
- * @class gdal.FieldDefn
+ * @class FieldDefn
  * @param {string} name Field name
- * @param {string} type Data type (see {{#crossLink "Constants (OFT)"}}OFT
- * constants{{/crossLink}})
+ * @param {string} type Data type (see {@link Constants (OFT)|OFT}
  */
 NAN_METHOD(FieldDefn::New) {
 
@@ -118,7 +117,10 @@ NAN_METHOD(FieldDefn::toString) {
 }
 
 /**
- * @attribute name
+ * @kind member
+ * @name name
+ * @instance
+ * @memberof FieldDefn
  * @type {string}
  */
 NAN_GETTER(FieldDefn::nameGetter) {
@@ -127,9 +129,12 @@ NAN_GETTER(FieldDefn::nameGetter) {
 }
 
 /**
- * Data type (see {{#crossLink "Constants (OFT)"}}OFT constants{{/crossLink}})
+ * Data type (see {@link OFT|OFT constants}
  *
- * @attribute type
+ * @kind member
+ * @name type
+ * @instance
+ * @memberof FieldDefn
  * @type {string}
  */
 NAN_GETTER(FieldDefn::typeGetter) {
@@ -138,7 +143,10 @@ NAN_GETTER(FieldDefn::typeGetter) {
 }
 
 /**
- * @attribute ignored
+ * @kind member
+ * @name ignored
+ * @instance
+ * @memberof FieldDefn
  * @type {boolean}
  */
 NAN_GETTER(FieldDefn::ignoredGetter) {
@@ -147,10 +155,12 @@ NAN_GETTER(FieldDefn::ignoredGetter) {
 }
 
 /**
- * Field justification (see {{#crossLink "Constants (OJ)"}}OJ
- * constants{{/crossLink}})
+ * Field justification (see {@link OJ|OJ constants})
  *
- * @attribute justification
+ * @kind member
+ * @name justification
+ * @instance
+ * @memberof FieldDefn
  * @type {string}
  */
 NAN_GETTER(FieldDefn::justificationGetter) {
@@ -168,7 +178,10 @@ NAN_GETTER(FieldDefn::justificationGetter) {
 }
 
 /**
- * @attribute width
+ * @kind member
+ * @name width
+ * @instance
+ * @memberof FieldDefn
  * @type {number}
  */
 NAN_GETTER(FieldDefn::widthGetter) {
@@ -177,7 +190,10 @@ NAN_GETTER(FieldDefn::widthGetter) {
 }
 
 /**
- * @attribute precision
+ * @kind member
+ * @name precision
+ * @instance
+ * @memberof FieldDefn
  * @type {number}
  */
 NAN_GETTER(FieldDefn::precisionGetter) {

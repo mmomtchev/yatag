@@ -37,20 +37,21 @@ gdal.quiet()
 gdal.config = {}
 
 /**
- * @class gdal.config
+ * @namespace config
  */
 
 /**
  * Gets a GDAL configuration setting.
  *
  * @example
- * ```
- * data_path = gdal.config.get('GDAL_DATA');```
+ *
+ * data_path = gdal.config.get('GDAL_DATA');
  *
  * @static
  * @method get
+ * @memberof config
  * @param {string} key
- * @return {string}
+ * @return {string|null}
  */
 gdal.config.get = gdal.getConfigOption
 
@@ -58,13 +59,14 @@ gdal.config.get = gdal.getConfigOption
  * Sets a GDAL configuration setting.
  *
  * @example
- * ```
- * gdal.config.set('GDAL_DATA', data_path);```
+ *
+ * gdal.config.set('GDAL_DATA', data_path);
  *
  * @static
  * @method set
+ * @memberof config
  * @param {string} key
- * @param {string} value
+ * @param {string|null} value
  * @return {void}
  */
 gdal.config.set = gdal.setConfigOption
@@ -78,8 +80,10 @@ if (process.env.CURL_CA_BUNDLE === undefined && gdal.bundled) {
 
 /**
  * Callback using the standard Node.js error convention
- * @element callback
- * @typedef callback<T> (Error, T) => void
+ * @callback callback
+ * @typedef {(err: Error, obj: T) => void} callback<T>
+ * @param {Error} err
+ * @param {any} result
  */
 
 if (process.env.GDAL_DATA === undefined && gdal.bundled) {
@@ -138,16 +142,96 @@ gdal.RasterReadStream = readStream.RasterReadStream
 gdal.RasterBandPixels.prototype.createWriteStream = writeStream.createWriteStream
 gdal.RasterWriteStream = writeStream.RasterWriteStream
 gdal.RasterMuxStream = muxStream.RasterMuxStream
+gdal.RasterTransform = muxStream.RasterTransform
+
+gdal.calcAsync = require('./calc')(gdal)
 
 /**
- * Returns a {{#crossLink "Envelope"}}gdal.Envelope{{/crossLink}} object for the raster bands
+ * @interface xyz
+ * @property {number} x
+ * @property {number} y
+ * @property {number} [z]
+ */
+
+/**
+ * @callback ProgressCb
+ * @param {number} complete
+ * @param {string} msg
+ * @typedef {( complete: number, msg: string ) => void} ProgressCb
+ */
+
+/**
+ * @typedef {object} ProgressOptions
+ * @property {ProgressCb} progress_cb
+ */
+
+/**
+ * Returns a TypedArray (https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView#Typed_array_subclasses) constructor from a GDAL data type
  *
  * @example
- * ```
- * const extent = dataset.getEnvelope()
- * ````
  *
- * @for gdal.DatasetBands
+ * const array = new (gdal.fromDataType(band.dataType))(band.size.x * band.size.y)
+ * `
+ *
+ * @method fromDataType
+ * @throws TypeError
+ * @param {string|null} dataType
+ * @return {new (len: number) => TypedArray}
+ */
+gdal.fromDataType = (() => {
+  const fromDataTypeList = {}
+  fromDataTypeList[gdal.GDT_Byte] = Uint8Array
+  fromDataTypeList[gdal.GDT_Int16] = Int16Array
+  fromDataTypeList[gdal.GDT_UInt16] = Uint16Array
+  fromDataTypeList[gdal.GDT_Int32] = Int32Array
+  fromDataTypeList[gdal.GDT_UInt32] = Uint32Array
+  fromDataTypeList[gdal.GDT_Float32] = Float32Array
+  fromDataTypeList[gdal.GDT_Float64] = Float64Array
+
+  return (dtype) => {
+    if (!fromDataTypeList[dtype]) throw new TypeError('No such GDAL type')
+    return fromDataTypeList[dtype]
+  }
+})()
+
+/**
+ * Returns a GDAL data type from a TypedArray (https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView#Typed_array_subclasses)
+ *
+ * @example
+ *
+ * const dataType = gdal.fromDataType(array)
+ * `
+ *
+ * @method toDataType
+ * @throws TypeError
+ * @param {TypedArray} array
+ * @return {string}
+ */
+gdal.toDataType = (() => {
+  const toDataTypeList = {}
+  toDataTypeList[Uint8Array] = gdal.GDT_Byte
+  toDataTypeList[Int16Array] = gdal.GDT_Float64
+  toDataTypeList[Uint16Array] = gdal.GDT_UInt16
+  toDataTypeList[Int32Array] = gdal.GDT_Int32
+  toDataTypeList[Uint32Array] = gdal.GDT_UInt32
+  toDataTypeList[Float32Array] = gdal.GDT_Float32
+  toDataTypeList[Float64Array] = gdal.GDT_Float64
+
+  return (dtype) => {
+    if (!toDataTypeList[dtype.constructor]) throw new TypeError('No such GDAL type')
+    return toDataTypeList[dtype.constructor]
+  }
+})()
+
+/**
+ * Returns a {@link Envelope|Envelope object for the raster bands}
+ *
+ * @example
+ *
+ * const extent = dataset.getEnvelope()
+ * `
+ *
+ * @memberof DatasetBands
  * @method getEnvelope
  * @return {Envelope}
  */
@@ -170,14 +254,13 @@ require('./iterators.js')(gdal)
  * Creates or opens a dataset. Dataset should be explicitly closed with `dataset.close()` method if opened in `"w"` mode to flush any changes. Otherwise, datasets are closed when (and if) node decides to garbage collect them.
  *
  * @example
- * ```
- * var dataset = gdal.open('./data.shp');```
+ *
+ * var dataset = gdal.open('./data.shp');
  *
  * @example
- * ```
- * var dataset = gdal.open(fs.readFileSync('./data.shp'));```
  *
- * @for gdal
+ * var dataset = gdal.open(fs.readFileSync('./data.shp'));
+ *
  * @throws Error
  * @method open
  * @static
@@ -268,18 +351,17 @@ const callbackify = require('util').callbackify
  * If the last parameter is a callback, then this callback is called on completion and undefined is returned. Otherwise the function returns a Promise resolved with the result.
  *
  * @example
- * ```
- * var dataset = await gdal.openAsync('./data.shp');```
+ *
+ * var dataset = await gdal.openAsync('./data.shp');
  *
  * @example
- * ```
- * var dataset = await gdal.openAsync(await fd.readFile('./data.shp'));```
+ *
+ * var dataset = await gdal.openAsync(await fd.readFile('./data.shp'));
  *
  * @example
- * ```
- * gdal.openAsync('./data.shp', (err, ds) => {...});```
  *
- * @for gdal
+ * gdal.openAsync('./data.shp', (err, ds) => {...});
+ *
  * @method openAsync
  * @static
  * @param {string|Buffer} path Path to dataset or in-memory Buffer to open
@@ -291,19 +373,17 @@ const callbackify = require('util').callbackify
  * @param {number} [band_count] Used when creating a raster dataset with the `"w"` mode.
  * @param {string} [data_type] Used when creating a raster dataset with the `"w"` mode.
  * @param {string[]|object} [creation_options] Used when creating a dataset with the `"w"` mode.
- * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @param {callback<Dataset>} [callback=undefined] {{{cb}}}
  * @return {Promise<Dataset>}
- *
  */
 
 /**
  * TypeScript shorthand version with callback and no optional arguments
  *
- * @for gdal
  * @method openAsync
  * @static
  * @param {string|Buffer} path Path to dataset or in-memory Buffer to open
- * @param {callback<void>} callback {{{cb}}}
+ * @param {callback<Dataset>} callback {{{cb}}}
  * @return {void}
  */
 
@@ -437,7 +517,7 @@ function fieldTypeFromValue(val) {
  * Creates a LayerFields instance from an object of keys and values.
  *
  * @method fromJSON
- * @for gdal.LayerFields
+ * @memberof LayerFields
  * @param {object} object
  * @param {boolean} [approx_ok=false]
  */
@@ -454,6 +534,14 @@ gdal.LayerFields.prototype.fromJSON = (function () {
   }
 })()
 
+/**
+ * Creates a LayerFields instance from an object of keys and values.
+ *
+ * @method fromObject
+ * @memberof LayerFields
+ * @param {Record<string, any>} object
+ * @param {boolean} [approx_ok=false]
+ */
 gdal.LayerFields.prototype.fromObject = function (obj, approx_ok) {
   approx_ok = approx_ok || false
   Object.entries(obj).forEach(([ k, v ]) => {
@@ -463,13 +551,6 @@ gdal.LayerFields.prototype.fromObject = function (obj, approx_ok) {
   })
 }
 
-/**
-* @for gdal.Geometry
-* @property wkbType
-* @final
-* @static
-* @type {number}
-*/
 gdal.Point.wkbType = gdal.wkbPoint
 gdal.LineString.wkbType = gdal.wkbLineString
 gdal.LinearRing.wkbType = gdal.wkbLinearRing
@@ -715,6 +796,10 @@ const promisifiables = {
   },
   MDArray: {
     readAsync: 1
+  },
+  fs: {
+    $statAsync: 2,
+    $readDirAsync: 1
   },
   GroupArrays: GroupCollection,
   GroupDimensions: GroupCollection,

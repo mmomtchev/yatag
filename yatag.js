@@ -12,13 +12,14 @@ function mangle(name) {
 }
 
 function expandParams(children) {
+    if (!children) return '';
     const expanded = Object.keys(children).filter((n) => n.startsWith('param#')).map((p) =>
         `${children[p].name}${children[p].defValue ? '?' : ''}: ${children[p].type || 'any'}`);
     return expanded.join(', ');
 }
 
 function expandMethod(defn, prefix) {
-    let output = `\n  ${defn.description}\n`;
+    let output = `\n  ${defn.description || ''}\n`;
     output += `  ${prefix || ''}${defn.name}(`;
     output += expandParams(defn.children);
     output += `): ${defn.return || 'void'}\n`;
@@ -26,7 +27,7 @@ function expandMethod(defn, prefix) {
 }
 
 function expandProperty(defn, prefix) {
-    let output = `\n  ${defn.description}\n`;
+    let output = `\n  ${defn.description || ''}\n`;
     output += `  ${prefix || ''}${defn.name}`;
     output += expandParams(defn.children);
     output += `: ${defn.type || 'unknown'}\n`;
@@ -36,13 +37,16 @@ function expandProperty(defn, prefix) {
 function expandType(defn, declaration) {
     let output = declaration;
     if (defn.description) output += defn.description;
-    if (Object.keys(defn.children).length > 0) {
+    const props = Object.keys(defn.children).filter((n) => n.startsWith('property#'));
+    if (props.length > 0) {
         output += '{\n';
-        for (const propId of Object.keys(defn.children).filter((n) => n.startsWith('property#'))) {
+        for (const propId of props) {
             const prop = defn.children[propId];
             output += `\t${prop.name}${prop.defValue ? '?' : ''}: ${prop.type};\n`;
         }
         output += '}';
+    } else if (defn.type) {
+        output += defn.type;
     }
     output += '\n\n';
     return output;
@@ -113,6 +117,7 @@ for (const file of inputFiles) {
                     newElement.name = name;
                     break;
                 case 'for':
+                case 'memberof':
                     if (!root.children[`class#${name}`]) {
                         root.children[`class#${name}`] = { context: 'class', name, children: {} };
                     }
@@ -121,21 +126,16 @@ for (const file of inputFiles) {
                 case 'extends':
                     newElement.extends = name;
                     break;
+                case 'function':
                 case 'method':
-                    if (name === 'Symbol.iterator') {
-                        newElement.context = 'iterator';
-                        newElement.name = '';
-                    } else if (name === 'Symbol.asyncIterator') {
-                        newElement.context = 'asyncIterator';
-                        newElement.name = '';
-                    } else {
-                        newElement.context = 'method';
-                        newElement.name = name;
-                    }
+                    newElement.context = 'method';
+                    newElement.name = name;
                     break;
                 case 'static':
                     newElement.static = true;
                     break;
+                case 'var':
+                case 'member':
                 case 'property':
                 case 'attribute':
                     if (newElement.context) {
@@ -166,6 +166,29 @@ for (const file of inputFiles) {
                 case 'final':
                     newElement.readonly = true;
                     break;
+                case 'name':
+                    newElement.name = name;
+                    break;
+                case 'kind':
+                    switch (name) {
+                    case 'member':
+                        newElement.context = 'property';
+                        break;
+                    case 'method':
+                        newElement.context = 'method';
+                        break;
+                    }
+                    break;
+                case 'constant':
+                    newElement.context = 'property';
+                    newElement.readonly = true;
+                    if (groups) {
+                        if (groups.type)
+                            newElement.type = groups.type;
+                        if (groups.name)
+                            newElement.name = groups.name;
+                    }
+                    break;
                 default:
                     continue;
                 }
@@ -175,6 +198,18 @@ for (const file of inputFiles) {
                 process.exit(1);
             }
         }
+
+        if (newElement.context === 'method') {
+            if (newElement.name === 'Symbol.iterator' || newElement.name === '@@iterator') {
+                newElement.context = 'iterator';
+                newElement.name = '';
+            }
+            if (newElement.name === 'Symbol.asyncIterator' || newElement.name === '@@asyncIterator') {
+                newElement.context = 'asyncIterator';
+                newElement.name = '';
+            }
+        }
+
         let key = `${newElement.context}#${newElement.name}`;
         // method overloading
         if (newElement.context === 'method')

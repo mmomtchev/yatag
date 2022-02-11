@@ -98,27 +98,13 @@ class AsyncGuard {
     if (uids.size() == 1) {
       if (uids[0] == 0) return;
       lock = warning ? object_store.tryLockDataset(uids[0]) : object_store.lockDataset(uids[0]);
-      if (lock == nullptr) {
-        auto start = std::chrono::high_resolution_clock::now();
-        fprintf(stderr, eventLoopWarning);
-        lock = object_store.lockDataset(uids[0]);
-        auto elapsed = std::chrono::high_resolution_clock::now() - start;
-        fprintf(
-          stderr,
-          "%ld µs\n",
-          static_cast<long>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count()));
-      }
+      if (lock == nullptr) { MEASURE_EXECUTION_TIME(eventLoopWarning, lock = object_store.lockDataset(uids[0])); }
     } else {
       locks = warning ? make_shared<vector<AsyncLock>>(object_store.tryLockDatasets(uids))
                       : make_shared<vector<AsyncLock>>(object_store.lockDatasets(uids));
       if (locks->size() == 0) {
-        auto start = std::chrono::high_resolution_clock::now();
-        fprintf(stderr, eventLoopWarning);
-        auto elapsed = std::chrono::high_resolution_clock::now() - start;
-        fprintf(
-          stderr,
-          "%ld µs\n",
-          static_cast<long>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count()));
+        MEASURE_EXECUTION_TIME(
+          eventLoopWarning, locks = make_shared<vector<AsyncLock>>(object_store.lockDatasets(uids)));
       }
     }
   }
@@ -144,6 +130,7 @@ struct GDALProgressInfo {
   GDALProgressInfo(const GDALProgressInfo &o);
   GDALProgressInfo(double, const char *);
   GDALProgressInfo();
+  ~GDALProgressInfo() = default;
 };
 
 class GDALSyncExecutionProgress {
@@ -176,15 +163,6 @@ class GDALExecutionProgress {
   ~GDALExecutionProgress();
   void Send(GDALProgressInfo *info) const;
 };
-
-/**
- * @typedef ProgressOptions
- * @property {ProgressCb} progress_cb
- */
-
-/**
- * @typedef ProgressCb ( complete: number, msg: string ) => void
- */
 
 // This is the progress callback trampoline
 // It can be invoked both in the main thread (in sync mode) or in auxillary thread (in async mode)
@@ -432,9 +410,9 @@ template <class GDALType> class GDALAsyncableJob {
   }
 
   void run(const Nan::FunctionCallbackInfo<v8::Value> &info, bool async, int cb_arg) {
+    if (!info.This().IsEmpty() && info.This()->IsObject()) persist("this", info.This());
     if (async) {
       if (progress) persist("progress_cb", progress->GetFunction());
-      if (!info.This().IsEmpty() && info.This()->IsObject()) persist("this", info.This());
       Nan::Callback *callback;
       NODE_ARG_CB(cb_arg, "callback", callback);
       Nan::AsyncQueueWorker(new GDALCallbackWorker<GDALType>(callback, progress, main, rval, persistent, ds_uids));
@@ -451,8 +429,8 @@ template <class GDALType> class GDALAsyncableJob {
   }
 
   void run(Nan::NAN_GETTER_ARGS_TYPE info, bool async) {
+    if (!info.This().IsEmpty() && info.This()->IsObject()) persist("this", info.This());
     if (async) {
-      if (!info.This().IsEmpty() && info.This()->IsObject()) persist("this", info.This());
       auto worker = new GDALPromiseWorker<GDALType>(info, main, rval, persistent, ds_uids);
       info.GetReturnValue().Set(worker->Promise());
       Nan::AsyncQueueWorker(worker);

@@ -51,19 +51,19 @@ RasterBand *RasterBandPixels::parent(const Nan::FunctionCallbackInfo<v8::Value> 
 }
 
 /**
- * A representation of a {{#crossLink
- * "gdal.RasterBand"}}RasterBand{{/crossLink}}'s pixels.
+ * A representation of a {@link RasterBand}'s pixels.
  *
  *
  * Note: Typed arrays should be created with an external ArrayBuffer for
  * versions of node >= 0.11
- * ```
- * var n = 16*16;
- * var data = new Float32Array(new ArrayBuffer(n*4));
- * //read data into the existing array
- * band.pixels.read(0,0,16,16,data);```
  *
- * @class gdal.RasterBandPixels
+ * @example
+ * const n = 16*16;
+ * const data = new Float32Array(new ArrayBuffer(n*4));
+ * //read data into the existing array
+ * band.pixels.read(0,0,16,16,data);
+ *
+ * @class RasterBandPixels
  */
 NAN_METHOD(RasterBandPixels::New) {
 
@@ -106,6 +106,8 @@ NAN_METHOD(RasterBandPixels::toString) {
  * Returns the value at the x, y coordinate.
  *
  * @method get
+ * @instance
+ * @memberof RasterBandPixels
  * @param {number} x
  * @param {number} y
  * @throws Error
@@ -117,6 +119,8 @@ NAN_METHOD(RasterBandPixels::toString) {
  * {{{async}}}
  *
  * @method getAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @param {number} x
  * @param {number} y
  * @param {callback<number>} [callback=undefined] {{{cb}}}
@@ -144,7 +148,7 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::get) {
     return val;
   };
 
-  job.rval = [](double val, GetFromPersistentFunc) { return Nan::New<Number>(val); };
+  job.rval = [](double val, const GetFromPersistentFunc &) { return Nan::New<Number>(val); };
   job.run(info, async, 2);
 }
 
@@ -152,6 +156,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::get) {
  * Sets the value at the x, y coordinate.
  *
  * @method set
+ * @instance
+ * @memberof RasterBandPixels
  * @param {number} x
  * @param {number} y
  * @param {number} value
@@ -162,6 +168,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::get) {
  * {{{async}}}
  *
  * @method setAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @param {number} x
  * @param {number} y
  * @param {number} value
@@ -191,7 +199,7 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::set) {
     return err;
   };
 
-  job.rval = [](CPLErr r, GetFromPersistentFunc) { return Nan::Undefined(); };
+  job.rval = [](CPLErr r, const GetFromPersistentFunc &) { return Nan::Undefined(); };
   job.run(info, async, 3);
 }
 
@@ -248,9 +256,29 @@ static inline int findHighest(int w, int h, int px, int ln, int offset) {
 }
 
 /**
+ * @typedef {Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array} TypedArray
+ * @memberof RasterBandPixels
+ */
+
+/**
+ * @typedef {object} ReadOptions
+ * @memberof RasterBandPixels
+ * @property {number} [buffer_width]
+ * @property {number} [buffer_height]
+ * @property {string} [type]
+ * @property {number} [pixel_space]
+ * @property {number} [line_space]
+ * @property {string} [resampling]
+ * @property {ProgressCb} [progress_cb]
+ * @property {number} [offset]
+ */
+
+/**
  * Reads a region of pixels.
  *
  * @method read
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -260,10 +288,10 @@ static inline int findHighest(int w, int h, int px, int ln, int offset) {
  * @param {ReadOptions} [options]
  * @param {number} [options.buffer_width=x_size]
  * @param {number} [options.buffer_height=y_size]
- * @param {string} [options.data_type] See {{#crossLink "Constants (GDT)"}}GDT constants{{/crossLink}}.
+ * @param {string} [options.data_type] See {@link GDT|GDT constants}
  * @param {number} [options.pixel_space]
  * @param {number} [options.line_space]
- * @param {string} [options.resampling] Resampling algorithm ({{#crossLink "Constants (GRA)"}}available options{{/crossLink}})
+ * @param {string} [options.resampling] Resampling algorithm ({@link GRA|available options})
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @return {TypedArray} A TypedArray (https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView#Typed_array_subclasses) of values.
  */
@@ -273,6 +301,8 @@ static inline int findHighest(int w, int h, int px, int ln, int offset) {
  * {{{async}}}
  *
  * @method readAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @param {number} x
  * @param {number} y
  * @param {number} width the width
@@ -281,10 +311,10 @@ static inline int findHighest(int w, int h, int px, int ln, int offset) {
  * @param {ReadOptions} [options]
  * @param {number} [options.buffer_width=x_size]
  * @param {number} [options.buffer_height=y_size]
- * @param {string} [options.data_type] See {{#crossLink "Constants (GDT)"}}GDT constants{{/crossLink}}.
+ * @param {string} [options.data_type] See {@link GDT|GDT constants}
  * @param {number} [options.pixel_space]
  * @param {number} [options.line_space]
- * @param {string} [options.resampling] Resampling algorithm ({{#crossLink "Constants (GRA)"}}available options{{/crossLink}})
+ * @param {string} [options.resampling] Resampling algorithm ({@link GRA|available options}
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @param {callback<TypedArray>} [callback=undefined] {{{cb}}}
  * @return {Promise<TypedArray>} A TypedArray (https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView#Typed_array_subclasses) of values.
@@ -392,14 +422,27 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::read) {
     return err;
   };
 
-  job.rval = [](CPLErr err, GetFromPersistentFunc getter) { return getter("array"); };
+  job.rval = [](CPLErr err, const GetFromPersistentFunc &getter) { return getter("array"); };
   job.run(info, async, 13);
 }
+
+/**
+ * @typedef {object} WriteOptions
+ * @memberof RasterBandPixels
+ * @property {number} [buffer_width]
+ * @property {number} [buffer_height]
+ * @property {number} [pixel_space]
+ * @property {number} [line_space]
+ * @property {ProgressCb} [progress_cb]
+ * @property {number} [offset]
+ */
 
 /**
  * Writes a region of pixels.
  *
  * @method write
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -419,6 +462,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::read) {
  * {{{async}}}
  *
  * @method writeAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @param {number} x
  * @param {number} y
  * @param {number} width
@@ -512,7 +557,7 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::write) {
     if (err != CE_None) throw CPLGetLastErrorMsg();
     return err;
   };
-  job.rval = [](CPLErr, GetFromPersistentFunc getter) { return getter("array"); };
+  job.rval = [](CPLErr, const GetFromPersistentFunc &getter) { return getter("array"); };
 
   job.run(info, async, 11);
 }
@@ -521,6 +566,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::write) {
  * Reads a block of pixels.
  *
  * @method readBlock
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -533,6 +580,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::write) {
  * {{{async}}}
  *
  * @method readBlockAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -584,7 +633,7 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::readBlock) {
     if (err) { throw CPLGetLastErrorMsg(); }
     return err;
   };
-  job.rval = [](CPLErr r, GetFromPersistentFunc getter) { return getter("array"); };
+  job.rval = [](CPLErr r, const GetFromPersistentFunc &getter) { return getter("array"); };
   job.run(info, async, 3);
 }
 
@@ -592,6 +641,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::readBlock) {
  * Writes a block of pixels.
  *
  * @method writeBlock
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -603,6 +654,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::readBlock) {
  * {{{async}}}
  *
  * @method writeBlockAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -641,7 +694,7 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::writeBlock) {
     if (err) { throw CPLGetLastErrorMsg(); }
     return err;
   };
-  job.rval = [](CPLErr r, GetFromPersistentFunc) { return Nan::Undefined(); };
+  job.rval = [](CPLErr r, const GetFromPersistentFunc &) { return Nan::Undefined(); };
   job.run(info, async, 3);
 }
 
@@ -650,6 +703,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::writeBlock) {
  * Handles partial blocks at the edges of the raster and returns the true number of pixels.
  *
  * @method clampBlock
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -662,6 +717,8 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::writeBlock) {
  * {{{async}}}
  *
  * @method clampBlockAsync
+ * @instance
+ * @memberof RasterBandPixels
  * @throws Error
  * @param {number} x
  * @param {number} y
@@ -691,7 +748,7 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::clampBlock) {
     if (err != CE_None) { throw CPLGetLastErrorMsg(); }
     return r;
   };
-  job.rval = [](xy r, GetFromPersistentFunc) {
+  job.rval = [](xy r, const GetFromPersistentFunc &) {
     Nan::EscapableHandleScope scope;
     Local<Object> result = Nan::New<Object>();
     Nan::Set(result, Nan::New("x").ToLocalChecked(), Nan::New<Integer>(r.x));
@@ -704,9 +761,12 @@ GDAL_ASYNCABLE_DEFINE(RasterBandPixels::clampBlock) {
 /**
  * Parent raster band
  *
- * @readOnly
- * @attribute band
- * @type {gdal.RasterBand}
+ * @readonly
+ * @kind member
+ * @name band
+ * @instance
+ * @memberof RasterBandPixels
+ * @type {RasterBand}
  */
 NAN_GETTER(RasterBandPixels::bandGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("parent_").ToLocalChecked()).ToLocalChecked());

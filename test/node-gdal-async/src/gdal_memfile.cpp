@@ -3,9 +3,9 @@
 namespace node_gdal {
 
 /**
- * Operations on in-memory `/vsimem/` files
+ * File operations specific to in-memory `/vsimem/` files
  *
- * @class gdal.vsimem
+ * @namespace vsimem
  */
 
 std::map<void *, Memfile *> Memfile::memfile_collection;
@@ -37,6 +37,7 @@ void Memfile::Initialize(Local<Object> target) {
   Nan::SetMethod(vsimem, "_anonymous", Memfile::vsimemAnonymous); // not a public API
   Nan::SetMethod(vsimem, "set", Memfile::vsimemSet);
   Nan::SetMethod(vsimem, "release", Memfile::vsimemRelease);
+  Nan::SetMethod(vsimem, "copy", Memfile::vsimemCopy);
 }
 
 // Anonymous buffers are handled by the GC
@@ -80,14 +81,46 @@ Memfile *Memfile::get(Local<Object> buffer, const std::string &filename) {
   return mem;
 }
 
+// GDAL buffers handled by GDAL and are not referenced by node-gdal-async
+bool Memfile::copy(Local<Object> buffer, const std::string &filename) {
+  if (!Buffer::HasInstance(buffer)) return false;
+  void *data = node::Buffer::Data(buffer);
+  if (data == nullptr) return false;
+
+  size_t len = node::Buffer::Length(buffer);
+
+  void *dataCopy = CPLMalloc(len);
+  if (dataCopy == nullptr) return false;
+
+  // If you malloc, you adjust external memory too (https://github.com/nodejs/node/issues/40936)
+  Nan::AdjustExternalMemory(len);
+  memcpy(dataCopy, data, len);
+
+  VSILFILE *vsi = VSIFileFromMemBuffer(filename.c_str(), (GByte *)dataCopy, len, 1);
+  if (vsi == nullptr) {
+    CPLFree(dataCopy);
+    return false;
+  }
+  VSIFCloseL(vsi);
+  return true;
+}
+
 /**
  * Create an in-memory `/vsimem/` file from a `Buffer`.
  * This is a zero-copy operation - GDAL will read from the Buffer which will be
  * protected by the GC even if it goes out of scope.
+ *
  * The file will stay in memory until it is deleted with `gdal.vsimem.release`.
+ *
+ * The file will be in read-write mode, but GDAL won't
+ * be able to extend it as the allocated memory will be tied to the `Buffer` object.
+ * Use `gdal.vsimem.copy` to create an extendable copy.
  *
  * @static
  * @method set
+ * @instance
+ * @memberof vsimem
+ * @throws Error
  * @param {Buffer} data A binary buffer containing the file data
  * @param {string} filename A file name beginning with `/vsimem/`
  */
@@ -100,6 +133,32 @@ NAN_METHOD(Memfile::vsimemSet) {
 
   Memfile *memfile = Memfile::get(buffer, filename);
   if (memfile == nullptr) Nan::ThrowError("Failed creating in-memory file");
+}
+
+/**
+ * Create an in-memory `/vsimem/` file copying a `Buffer`.
+ * This method copies the `Buffer` into GDAL's own memory heap
+ * creating an in-memory file that can be freely extended by GDAL.
+ * `gdal.vsimem.set` is the better choice unless the file needs to be extended.
+ *
+ * The file will stay in memory until it is deleted with `gdal.vsimem.release`.
+ *
+ * @static
+ * @method copy
+ * @instance
+ * @memberof vsimem
+ * @throws Error
+ * @param {Buffer} data A binary buffer containing the file data
+ * @param {string} filename A file name beginning with `/vsimem/`
+ */
+NAN_METHOD(Memfile::vsimemCopy) {
+  Local<Object> buffer;
+  std::string filename;
+
+  NODE_ARG_OBJECT(0, "buffer", buffer);
+  NODE_ARG_STR(1, "filename", filename);
+
+  if (!Memfile::copy(buffer, filename)) Nan::ThrowError("Failed creating in-memory file");
 }
 
 /*
@@ -131,12 +190,14 @@ NAN_METHOD(Memfile::vsimemAnonymous) {
  * ***WARNING***!
  *
  * The file must not be open or random memory corruption is possible with GDAL <= 3.3.1.
- * GDAL >= 3.3.2 will gracefully fail further operations and this function is safe.
+ * GDAL >= 3.3.2 will gracefully fail further operations and this function will always be safe.
  *
  * @static
  * @method release
+ * @instance
+ * @memberof vsimem
  * @param {string} filename A file name beginning with `/vsimem/`
- * @throws
+ * @throws Error
  * @return {Buffer} A binary buffer containing all the data
  */
 NAN_METHOD(Memfile::vsimemRelease) {
@@ -163,8 +224,22 @@ NAN_METHOD(Memfile::vsimemRelease) {
   } else {
     // the file has been created by GDAL and the buffer is owned by GDAL
     // -> a new Buffer is constructed and GDAL has to relinquish control
+    // The GC will call the lambda at some point to free the backing storage
     VSIGetMemFileBuffer(filename.c_str(), &len, true);
-    info.GetReturnValue().Set(Nan::NewBuffer(static_cast<char *>(data), static_cast<uint32_t>(len)).ToLocalChecked());
+    // Alas we can't take the address of a capturing lambda
+    // so we fall back to doing this like it was back in the day
+    int *hint = new int{static_cast<int>(len)};
+    info.GetReturnValue().Set(Nan::NewBuffer(
+                                static_cast<char *>(data),
+                                static_cast<size_t>(len),
+                                [](char *data, void *hint) {
+                                  int *len = reinterpret_cast<int *>(hint);
+                                  Nan::AdjustExternalMemory(-(*len));
+                                  delete len;
+                                  CPLFree(data);
+                                },
+                                hint)
+                                .ToLocalChecked());
   }
 }
 

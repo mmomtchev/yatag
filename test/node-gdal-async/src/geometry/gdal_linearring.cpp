@@ -55,12 +55,11 @@ Local<Value> LinearRing::New(OGRLinearRing *geom, bool owned) {
  * Concrete representation of a closed ring.
  *
  * @constructor
- * @class gdal.LinearRing
- * @extends gdal.LineString
+ * @class LinearRing
+ * @extends LineString
  */
 
 NAN_METHOD(LinearRing::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("LinearRing").ToLocalChecked());
 }
 
@@ -68,12 +67,13 @@ NAN_METHOD(LinearRing::toString) {
  * Computes the area enclosed by the ring.
  *
  * @method getArea
+ * @instance
+ * @memberof LinearRing
  * @return {number}
  */
 NODE_WRAPPED_METHOD_WITH_RESULT(LinearRing, getArea, Number, get_Area);
 
 NAN_METHOD(LinearRing::addSubLineString) {
-  Nan::HandleScope scope;
 
   LinearRing *geom = Nan::ObjectWrap::Unwrap<LinearRing>(info.This());
   LineString *other;

@@ -11,6 +11,28 @@ void Warper::Initialize(Local<Object> target) {
   Nan__SetAsyncableMethod(target, "suggestedWarpOutput", suggestedWarpOutput);
 }
 
+/**
+ * @typedef {object} ReprojectOptions
+ * @property {Dataset} src
+ * @property {Dataset} dst
+ * @property {SpatialReference} s_srs
+ * @property {SpatialReference} t_srs
+ * @property {string} [resampling]
+ * @property {Geometry} [cutline]
+ * @property {number[]} [srcBands]
+ * @property {number[]} [dstBands]
+ * @property {number} [srcAlphaBand]
+ * @property {number} [dstAlphaBand]
+ * @property {number} [srcNodata]
+ * @property {number} [dstNodata]
+ * @property {number} [blend]
+ * @property {number} [memoryLimit]
+ * @property {number} [maxError]
+ * @property {boolean} [multi]
+ * @property {object} [options]
+ * @property {ProgressCb} [progress_cb]
+ */
+
 /*
  * GDALReprojectImage() method with a ChunkAndWarpImage replaced with
  * ChunkAndWarpMulti
@@ -168,14 +190,13 @@ CPLErr GDALReprojectImageMulti(
  * @throws Error
  * @method reprojectImage
  * @static
- * @for gdal
  * @param {ReprojectOptions} options
- * @param {gdal.Dataset} options.src
- * @param {gdal.Dataset} options.dst
- * @param {gdal.SpatialReference} options.s_srs
- * @param {gdal.SpatialReference} options.t_srs
- * @param {string} [options.resampling] Resampling algorithm ({{#crossLink "Constants (GRA)"}}available options{{/crossLink}})
- * @param {gdal.Geometry} [options.cutline] Must be in src dataset pixel coordinates. Use CoordinateTransformation to convert between georeferenced coordinates and pixel coordinates
+ * @param {Dataset} options.src
+ * @param {Dataset} options.dst
+ * @param {SpatialReference} options.s_srs
+ * @param {SpatialReference} options.t_srs
+ * @param {string} [options.resampling] Resampling algorithm ({@link GRA|available options})
+ * @param {Geometry} [options.cutline] Must be in src dataset pixel coordinates. Use CoordinateTransformation to convert between georeferenced coordinates and pixel coordinates
  * @param {number[]} [options.srcBands]
  * @param {number[]} [options.dstBands]
  * @param {number} [options.srcAlphaBand]
@@ -185,7 +206,7 @@ CPLErr GDALReprojectImageMulti(
  * @param {number} [options.memoryLimit]
  * @param {number} [options.maxError]
  * @param {boolean} [options.multi]
- * @param {string[]|object} [options.options] Warp options (see: [reference](https://gdal.org/doxygen/structGDALWarpOptions.html))
+ * @param {string[]|object} [options.options] Warp options (see: [reference](https://org/doxygen/structGDALWarpOptions.html))
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  */
 
@@ -196,14 +217,13 @@ CPLErr GDALReprojectImageMulti(
  * @throws Error
  * @method reprojectImageAsync
  * @static
- * @for gdal
  * @param {ReprojectOptions} options
- * @param {gdal.Dataset} options.src
- * @param {gdal.Dataset} options.dst
- * @param {gdal.SpatialReference} options.s_srs
- * @param {gdal.SpatialReference} options.t_srs
- * @param {string} [options.resampling] Resampling algorithm ({{#crossLink "Constants (GRA)"}}available options{{/crossLink}})
- * @param {gdal.Geometry} [options.cutline] Must be in src dataset pixel coordinates. Use CoordinateTransformation to convert between georeferenced coordinates and pixel coordinates
+ * @param {Dataset} options.src
+ * @param {Dataset} options.dst
+ * @param {SpatialReference} options.s_srs
+ * @param {SpatialReference} options.t_srs
+ * @param {string} [options.resampling] Resampling algorithm ({@link GRA|available options})
+ * @param {Geometry} [options.cutline] Must be in src dataset pixel coordinates. Use CoordinateTransformation to convert between georeferenced coordinates and pixel coordinates
  * @param {number[]} [options.srcBands]
  * @param {number[]} [options.dstBands]
  * @param {number} [options.srcAlphaBand]
@@ -213,7 +233,7 @@ CPLErr GDALReprojectImageMulti(
  * @param {number} [options.memoryLimit]
  * @param {number} [options.maxError]
  * @param {boolean} [options.multi]
- * @param {string[]|object} [options.options] Warp options (see:[reference](https://gdal.org/doxygen/structGDALWarpOptions.html)
+ * @param {string[]|object} [options.options] Warp options (see:[reference](https://org/doxygen/structGDALWarpOptions.html)
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<void>}
@@ -306,9 +326,23 @@ GDAL_ASYNCABLE_DEFINE(Warper::reprojectImage) {
     };
   }
 
-  job.rval = [](CPLErr r, GetFromPersistentFunc) { return Nan::Undefined(); };
+  job.rval = [](CPLErr r, const GetFromPersistentFunc &) { return Nan::Undefined(); };
   job.run(info, async, 1);
 }
+
+/**
+ * @typedef {object} WarpOptions
+ * @property {Dataset} src
+ * @property {SpatialReference} s_srs
+ * @property {SpatialReference} t_srs
+ * @property {number} [maxError]
+ */
+
+/**
+ * @typedef {object} WarpOutput
+ * @property {xyz} rasterSize
+ * @property {number[]} geoTransform
+ */
 
 /**
  * Used to determine the bounds and resolution of the output virtual file which
@@ -317,11 +351,10 @@ GDAL_ASYNCABLE_DEFINE(Warper::reprojectImage) {
  * @throws Error
  * @method suggestedWarpOutput
  * @static
- * @for gdal
  * @param {WarpOptions} options Warp options
- * @param {gdal.Dataset} options.src
- * @param {gdal.SpatialReference} options.s_srs
- * @param {gdal.SpatialReference} options.t_srs
+ * @param {Dataset} options.src
+ * @param {SpatialReference} options.s_srs
+ * @param {SpatialReference} options.t_srs
  * @param {number} [options.maxError=0]
  * @return {WarpOutput} An object containing `"rasterSize"` and `"geoTransform"`
  * properties.
@@ -335,11 +368,10 @@ GDAL_ASYNCABLE_DEFINE(Warper::reprojectImage) {
  * @throws Error
  * @method suggestedWarpOutputAsync
  * @static
- * @for gdal
  * @param {WarpOptions} options Warp options
- * @param {gdal.Dataset} options.src
- * @param {gdal.SpatialReference} options.s_srs
- * @param {gdal.SpatialReference} options.t_srs
+ * @param {Dataset} options.src
+ * @param {SpatialReference} options.s_srs
+ * @param {SpatialReference} options.t_srs
  * @param {number} [options.maxError=0]
  * @param {callback<WarpOutput>} [callback=undefined] {{{cb}}}
  * @return {Promise<WarpOutput>}
@@ -437,7 +469,7 @@ GDAL_ASYNCABLE_DEFINE(Warper::suggestedWarpOutput) {
     return r;
   };
 
-  job.rval = [](warpOutputResult r, GetFromPersistentFunc) {
+  job.rval = [](warpOutputResult r, const GetFromPersistentFunc &) {
     Nan::EscapableHandleScope scope;
     Local<Array> result_geotransform = Nan::New<Array>();
     Nan::Set(result_geotransform, 0, Nan::New<Number>(r.geotransform[0]));

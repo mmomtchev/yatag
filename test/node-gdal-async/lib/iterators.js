@@ -1,9 +1,8 @@
 module.exports = function (gdal) {
 
   /**
- * forEach() callback type
- * @element forEachCb
- * @typedef forEachCb<T> (obj: T, idx: number) => boolean|void
+ * @callback forEachCb
+ * @typedef {(obj: T, idx: number) => boolean|void} forEachCb<T>
  */
 
   /**
@@ -11,12 +10,12 @@ module.exports = function (gdal) {
  * Note: GDAL band indexes start at 1, not 0.
  *
  * @example
- * ```
- * dataset.bands.forEach(function(band, i) { ... });```
  *
- * @for gdal.DatasetBands
+ * dataset.bands.forEach(function(band, i) { ... });
+ *
+ * @memberof DatasetBands
  * @method forEach
- * @param {forEachCb<gdal.RasterBand>} callback The callback to be called with each {{#crossLink "RasterBand"}}RasterBand{{/crossLink}}
+ * @param {forEachCb<RasterBand>} callback The callback to be called with each {@link RasterBand}
  */
   gdal.DatasetBands.prototype.forEach = function (callback) {
     const n = this.count()
@@ -29,12 +28,12 @@ module.exports = function (gdal) {
  * Iterates through all bands using an iterator
  *
  * @example
- * ```
- * for (const band of dataset.bands) {
- * }```
  *
- * @for gdal.DatasetBands
- * @type {gdal.RasterBand}
+ * for (const band of dataset.bands) {
+ * }
+ *
+ * @memberof DatasetBands
+ * @type {RasterBand}
  * @method Symbol.iterator
  */
   gdal.DatasetBands.prototype[Symbol.iterator] = function () {
@@ -55,12 +54,12 @@ module.exports = function (gdal) {
  * Iterates through all bands using an async iterator
  *
  * @example
- * ```
- * for await (const band of dataset.bands) {
- * }```
  *
- * @for gdal.DatasetBands
- * @type {gdal.RasterBand}
+ * for await (const band of dataset.bands) {
+ * }
+ *
+ * @memberof DatasetBands
+ * @type {RasterBand}
  * @method Symbol.asyncIterator
  */
   if (Symbol.asyncIterator) {
@@ -83,12 +82,12 @@ module.exports = function (gdal) {
  * Iterates through all features using a callback function.
  *
  * @example
- * ```
- * layer.features.forEach(function(feature, i) { ... });```
  *
- * @for gdal.LayerFeatures
+ * layer.features.forEach(function(feature, i) { ... });
+ *
+ * @memberof LayerFeatures
  * @method forEach
- * @param {forEachCb<gdal.Feature>} callback The callback to be called with each {{#crossLink "Feature"}}Feature{{/crossLink}}
+ * @param {forEachCb<Feature>} callback The callback to be called with each {@link Feature}
  */
   gdal.LayerFeatures.prototype.forEach = function (callback) {
     let i = 0
@@ -103,12 +102,12 @@ module.exports = function (gdal) {
  * Iterates through all features using an iterator
  *
  * @example
- * ```
- * for (const feature of layer.features) {
- * }```
  *
- * @for gdal.LayerFeatures
- * @type {gdal.Feature}
+ * for (const feature of layer.features) {
+ * }
+ *
+ * @memberof LayerFeatures
+ * @type {Feature}
  * @method Symbol.iterator
  */
   gdal.LayerFeatures.prototype[Symbol.iterator] = function () {
@@ -129,12 +128,12 @@ module.exports = function (gdal) {
  * Iterates through all features using an async iterator
  *
  * @example
- * ```
- * for await (const feature of layer.features) {
- * }```
  *
- * @for gdal.LayerFeatures
- * @type {gdal.Feature}
+ * for await (const feature of layer.features) {
+ * }
+ *
+ * @memberof LayerFeatures
+ * @type {Feature}
  * @method Symbol.asyncIterator
  */
   if (Symbol.asyncIterator) {
@@ -157,12 +156,12 @@ module.exports = function (gdal) {
  * Iterates through all fields using a callback function.
  *
  * @example
- * ```
- * layer.features.get(0).fields.forEach(function(value, key) { ... });```
  *
- * @for gdal.FeatureFields
+ * layer.features.get(0).fields.forEach(function(value, key) { ... });
+ *
+ * @memberof FeatureFields
  * @method forEach
- * @param {forEachCb<fieldValue>} callback The callback to be called with each feature `value` and `key`.
+ * @param {forEachCb<any>} callback The callback to be called with each feature `value` and `key`.
  */
   gdal.FeatureFields.prototype.forEach = function (callback) {
     const obj = this.toObject()
@@ -174,7 +173,7 @@ module.exports = function (gdal) {
   /**
  * Outputs the fields as a serialized JSON string.
  *
- * @for gdal.FeatureFields
+ * @memberof FeatureFields
  * @method toJSON
  * @return {string} Serialized JSON
  */
@@ -185,7 +184,7 @@ module.exports = function (gdal) {
   /**
  * Converts the geometry to a GeoJSON object representation.
  *
- * @for gdal.Geometry
+ * @memberof Geometry
  * @method toObject
  * @return {object} GeoJSON
  */

@@ -29,12 +29,11 @@ void MultiPoint::Initialize(Local<Object> target) {
 
 /**
  * @constructor
- * @class gdal.MultiPoint
- * @extends gdal.GeometryCollection
+ * @class MultiPoint
+ * @extends GeometryCollection
  */
 
 NAN_METHOD(MultiPoint::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("MultiPoint").ToLocalChecked());
 }
 

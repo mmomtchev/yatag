@@ -32,18 +32,17 @@ void CircularString::Initialize(Local<Object> target) {
  * Concrete representation of an arc.
  *
  * @example
- * ```
+ *
  * var CircularString = new gdal.CircularString();
  * CircularString.points.add(new gdal.Point(0,0));
- * CircularString.points.add(new gdal.Point(0,10));```
+ * CircularString.points.add(new gdal.Point(0,10));
  *
  * @constructor
- * @class gdal.CircularString
- * @extends gdal.SimpleCurve
+ * @class CircularString
+ * @extends SimpleCurve
  */
 
 NAN_METHOD(CircularString::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("CircularString").ToLocalChecked());
 }
 

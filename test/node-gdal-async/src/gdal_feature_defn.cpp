@@ -49,7 +49,7 @@ FeatureDefn::~FeatureDefn() {
  * Definition of a feature class or feature layer.
  *
  * @constructor
- * @class gdal.FeatureDefn
+ * @class FeatureDefn
  */
 NAN_METHOD(FeatureDefn::New) {
   FeatureDefn *f;
@@ -119,7 +119,9 @@ NAN_METHOD(FeatureDefn::toString) {
  * Clones the feature definition.
  *
  * @method clone
- * @return {gdal.FeatureDefn}
+ * @instance
+ * @memberof FeatureDefn
+ * @return {FeatureDefn}
  */
 NAN_METHOD(FeatureDefn::clone) {
   FeatureDefn *def = Nan::ObjectWrap::Unwrap<FeatureDefn>(info.This());
@@ -127,8 +129,11 @@ NAN_METHOD(FeatureDefn::clone) {
 }
 
 /**
- * @readOnly
- * @attribute name
+ * @readonly
+ * @kind member
+ * @name name
+ * @instance
+ * @memberof FeatureDefn
  * @type {string}
  */
 NAN_GETTER(FeatureDefn::nameGetter) {
@@ -137,10 +142,12 @@ NAN_GETTER(FeatureDefn::nameGetter) {
 }
 
 /**
- * WKB geometry type ({{#crossLink "Constants (wkbGeometryType)"}}see
- * table{{/crossLink}})
+ * WKB geometry type ({@link wkbGeometryType|see table}
  *
- * @attribute geomType
+ * @kind member
+ * @name geomType
+ * @instance
+ * @memberof FeatureDefn
  * @type {number}
  */
 NAN_GETTER(FeatureDefn::geomTypeGetter) {
@@ -149,7 +156,10 @@ NAN_GETTER(FeatureDefn::geomTypeGetter) {
 }
 
 /**
- * @attribute geomIgnored
+ * @kind member
+ * @name geomIgnored
+ * @instance
+ * @memberof FeatureDefn
  * @type {boolean}
  */
 NAN_GETTER(FeatureDefn::geomIgnoredGetter) {
@@ -158,7 +168,10 @@ NAN_GETTER(FeatureDefn::geomIgnoredGetter) {
 }
 
 /**
- * @attribute styleIgnored
+ * @kind member
+ * @name styleIgnored
+ * @instance
+ * @memberof FeatureDefn
  * @type {boolean}
  */
 NAN_GETTER(FeatureDefn::styleIgnoredGetter) {
@@ -167,9 +180,12 @@ NAN_GETTER(FeatureDefn::styleIgnoredGetter) {
 }
 
 /**
- * @readOnly
- * @attribute fields
- * @type {gdal.FeatureDefnFields}
+ * @readonly
+ * @kind member
+ * @name fields
+ * @instance
+ * @memberof FeatureDefn
+ * @type {FeatureDefnFields}
  */
 NAN_GETTER(FeatureDefn::fieldsGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("fields_").ToLocalChecked()).ToLocalChecked());

@@ -38,13 +38,13 @@ DatasetLayers::~DatasetLayers() {
 }
 
 /**
- * An encapsulation of a {{#crossLink "gdal.Dataset"}}Dataset{{/crossLink}}'s
+ * An encapsulation of a {@link Dataset}
  * vector layers.
  *
- * ```
- * var layers = dataset.layers;```
+ * @example
+ * var layers = dataset.layers;
  *
- * @class gdal.DatasetLayers
+ * @class DatasetLayers
  */
 NAN_METHOD(DatasetLayers::New) {
 
@@ -87,9 +87,11 @@ NAN_METHOD(DatasetLayers::toString) {
  * Returns the layer with the given name or identifier.
  *
  * @method get
+ * @instance
+ * @memberof DatasetLayers
  * @param {string|number} key Layer name or ID.
  * @throws Error
- * @return {gdal.Layer}
+ * @return {Layer}
  */
 
 /**
@@ -97,10 +99,12 @@ NAN_METHOD(DatasetLayers::toString) {
  * {{{async}}}
  *
  * @method getAsync
+ * @instance
+ * @memberof DatasetLayers
  * @param {string|number} key Layer name or ID.
- * @param {callback<gdal.Layer>} [callback=undefined] {{{cb}}}
+ * @param {callback<Layer>} [callback=undefined] {{{cb}}}
  * @throws Error
- * @return {Promise<gdal.Layer>}
+ * @return {Promise<Layer>}
  */
 
 GDAL_ASYNCABLE_DEFINE(DatasetLayers::get) {
@@ -145,7 +149,7 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::get) {
     return;
   }
 
-  job.rval = [raw](OGRLayer *lyr, GetFromPersistentFunc) { return Layer::New(lyr, raw); };
+  job.rval = [raw](OGRLayer *lyr, const GetFromPersistentFunc &) { return Layer::New(lyr, raw); };
   job.run(info, async, 1);
 }
 
@@ -153,19 +157,20 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::get) {
  * Adds a new layer.
  *
  * @example
- * ```
+ *
  * dataset.layers.create('layername', null, gdal.Point);
- * ```
+ *
  *
  * @method create
+ * @instance
+ * @memberof DatasetLayers
  * @throws Error
  * @param {string} name Layer name
- * @param {gdal.SpatialReference|null} srs Layer projection
- * @param {number|Function} geomType Geometry type or constructor ({{#crossLink
- * "Constants (wkbGeometryType)"}}see geometry types{{/crossLink}})
+ * @param {SpatialReference|null} [srs=null] Layer projection
+ * @param {number|Function|null} [geomType=null] Geometry type or constructor ({@link wkbGeometryType|see geometry types})
  * @param {string[]|object} [creation_options] driver-specific layer creation
  * options
- * @return {gdal.Layer}
+ * @return {Layer}
  */
 
 /**
@@ -173,21 +178,22 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::get) {
  * {{{async}}}
  *
  * @example
- * ```
+ *
  * await dataset.layers.createAsync('layername', null, gdal.Point);
  * dataset.layers.createAsync('layername', null, gdal.Point, (e, r) => console.log(e, r));
- * ```
+ *
  *
  * @method createAsync
+ * @instance
+ * @memberof DatasetLayers
  * @throws Error
  * @param {string} name Layer name
- * @param {gdal.SpatialReference|null} srs Layer projection
- * @param {number|Function} geomType Geometry type or constructor ({{#crossLink
- * "Constants (wkbGeometryType)"}}see geometry types{{/crossLink}})
+ * @param {SpatialReference|null} [srs=null] Layer projection
+ * @param {number|Function|null} [geomType=null] Geometry type or constructor ({@link wkbGeometryType|see geometry types})
  * @param {string[]|object} [creation_options] driver-specific layer creation
  * options
- * @param {callback<gdal.Layer>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Layer>}
+ * @param {callback<Layer>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Layer>}
  */
 
 GDAL_ASYNCABLE_DEFINE(DatasetLayers::create) {
@@ -229,7 +235,7 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::create) {
     return layer;
   };
 
-  job.rval = [raw](OGRLayer *layer, GetFromPersistentFunc) { return Layer::New(layer, raw, false); };
+  job.rval = [raw](OGRLayer *layer, const GetFromPersistentFunc &) { return Layer::New(layer, raw, false); };
 
   job.run(info, async, 4);
 }
@@ -238,6 +244,8 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::create) {
  * Returns the number of layers.
  *
  * @method count
+ * @instance
+ * @memberof DatasetLayers
  * @return {number}
  */
 
@@ -246,6 +254,8 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::create) {
  * {{{async}}}
  *
  * @method countAsync
+ * @instance
+ * @memberof DatasetLayers
  * @param {callback<number>} [callback=undefined] {{{cb}}}
  * @return {Promise<number>}
  */
@@ -270,7 +280,7 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::count) {
     return count;
   };
 
-  job.rval = [](int count, GetFromPersistentFunc) { return Nan::New<Integer>(count); };
+  job.rval = [](int count, const GetFromPersistentFunc &) { return Nan::New<Integer>(count); };
   job.run(info, async, 0);
 }
 
@@ -278,10 +288,12 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::count) {
  * Copies a layer.
  *
  * @method copy
- * @param {string} src_lyr_name
+ * @instance
+ * @memberof DatasetLayers
+ * @param {Layer} src_lyr_name
  * @param {string} dst_lyr_name
  * @param {object|string[]} [options=null] layer creation options
- * @return {gdal.Layer}
+ * @return {Layer}
  */
 
 /**
@@ -289,11 +301,13 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::count) {
  * {{{async}}}
  *
  * @method copyAsync
- * @param {string} src_lyr_name
+ * @instance
+ * @memberof DatasetLayers
+ * @param {Layer} src_lyr_name
  * @param {string} dst_lyr_name
  * @param {object|string[]} [options=null] layer creation options
- * @param {callback<gdal.Layer>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Layer>}
+ * @param {callback<Layer>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Layer>}
  */
 
 GDAL_ASYNCABLE_DEFINE(DatasetLayers::copy) {
@@ -329,7 +343,7 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::copy) {
     return layer;
   };
 
-  job.rval = [raw](OGRLayer *layer, GetFromPersistentFunc) { return Layer::New(layer, raw); };
+  job.rval = [raw](OGRLayer *layer, const GetFromPersistentFunc &) { return Layer::New(layer, raw); };
 
   job.run(info, async, 3);
 }
@@ -338,6 +352,8 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::copy) {
  * Removes a layer.
  *
  * @method remove
+ * @instance
+ * @memberof DatasetLayers
  * @throws Error
  * @param {number} index
  */
@@ -347,6 +363,8 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::copy) {
  * {{{async}}}
  *
  * @method removeAsync
+ * @instance
+ * @memberof DatasetLayers
  * @throws Error
  * @param {number} index
  * @param {callback<void>} [callback=undefined] {{{cb}}}
@@ -376,16 +394,19 @@ GDAL_ASYNCABLE_DEFINE(DatasetLayers::remove) {
     return err;
   };
 
-  job.rval = [](int count, GetFromPersistentFunc) { return Nan::Undefined().As<Value>(); };
+  job.rval = [](int count, const GetFromPersistentFunc &) { return Nan::Undefined().As<Value>(); };
   job.run(info, async, 1);
 }
 
 /**
  * Parent dataset
  *
- * @readOnly
- * @attribute ds
- * @type {gdal.Dataset}
+ * @readonly
+ * @kind member
+ * @name ds
+ * @instance
+ * @memberof DatasetLayers
+ * @type {Dataset}
  */
 NAN_GETTER(DatasetLayers::dsGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("parent_").ToLocalChecked()).ToLocalChecked());

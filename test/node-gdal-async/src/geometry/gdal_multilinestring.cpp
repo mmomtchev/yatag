@@ -30,12 +30,11 @@ void MultiLineString::Initialize(Local<Object> target) {
 
 /**
  * @constructor
- * @class gdal.MultiLineString
- * @extends gdal.GeometryCollection
+ * @class MultiLineString
+ * @extends GeometryCollection
  */
 
 NAN_METHOD(MultiLineString::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("MultiLineString").ToLocalChecked());
 }
 
@@ -43,10 +42,11 @@ NAN_METHOD(MultiLineString::toString) {
  * Converts it to a polygon.
  *
  * @method polygonize
- * @return {gdal.Polygon}
+ * @instance
+ * @memberof MultiLineString
+ * @return {Polygon}
  */
 NAN_METHOD(MultiLineString::polygonize) {
-  Nan::HandleScope scope;
 
   MultiLineString *geom = Nan::ObjectWrap::Unwrap<MultiLineString>(info.This());
 

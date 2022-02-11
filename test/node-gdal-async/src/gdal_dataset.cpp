@@ -74,16 +74,16 @@ void Dataset::dispose(bool manual) {
 /**
  * A set of associated raster bands and/or vector layers, usually from one file.
  *
- * ```
+ * @example
  * // raster dataset:
  * dataset = gdal.open('file.tif');
  * bands = dataset.bands;
  *
  * // vector dataset:
  * dataset = gdal.open('file.shp');
- * layers = dataset.layers;```
+ * layers = dataset.layers;
  *
- * @class gdal.Dataset
+ * @class Dataset
  */
 NAN_METHOD(Dataset::New) {
 
@@ -158,6 +158,8 @@ NAN_METHOD(Dataset::toString) {
  * Fetch metadata.
  *
  * @method getMetadata
+ * @instance
+ * @memberof Dataset
  * @param {string} [domain]
  * @return {any}
  */
@@ -167,6 +169,8 @@ NAN_METHOD(Dataset::toString) {
  * {{{async}}}
  *
  * @method getMetadataAsync
+ * @instance
+ * @memberof Dataset
  * @param {string} [domain]
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<any>}
@@ -182,7 +186,7 @@ GDAL_ASYNCABLE_DEFINE(Dataset::getMetadata) {
   job.main = [raw, domain](const GDALExecutionProgress &) {
     return raw->GetMetadata(domain.empty() ? nullptr : domain.c_str());
   };
-  job.rval = [](char **md, GetFromPersistentFunc) { return MajorObject::getMetadata(md); };
+  job.rval = [](char **md, const GetFromPersistentFunc &) { return MajorObject::getMetadata(md); };
   job.run(info, async, 1);
 }
 
@@ -190,6 +194,8 @@ GDAL_ASYNCABLE_DEFINE(Dataset::getMetadata) {
  * Set metadata. Can return a warning (false) for formats not supporting persistent metadata.
  *
  * @method setMetadata
+ * @instance
+ * @memberof Dataset
  * @param {object|string[]} metadata
  * @param {string} [domain]
  * @return {boolean}
@@ -200,9 +206,11 @@ GDAL_ASYNCABLE_DEFINE(Dataset::getMetadata) {
  * {{{async}}}
  *
  * @method setMetadataAsync
+ * @instance
+ * @memberof Dataset
  * @param {object|string[]} metadata
  * @param {string} [domain]
- * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @param {callback<boolean>} [callback=undefined] {{{cb}}}
  * @return {Promise<boolean>}
  */
 GDAL_ASYNCABLE_DEFINE(Dataset::setMetadata) {
@@ -224,7 +232,7 @@ GDAL_ASYNCABLE_DEFINE(Dataset::setMetadata) {
     if (r == CE_Failure) throw CPLGetLastErrorMsg();
     return r;
   };
-  job.rval = [](CPLErr r, GetFromPersistentFunc) { return Nan::New<Boolean>(r == CE_None); };
+  job.rval = [](CPLErr r, const GetFromPersistentFunc &) { return Nan::New<Boolean>(r == CE_None); };
   job.run(info, async, 2);
 }
 
@@ -232,8 +240,9 @@ GDAL_ASYNCABLE_DEFINE(Dataset::setMetadata) {
  * Determines if the dataset supports the indicated operation.
  *
  * @method testCapability
- * @param {string} capability (see {{#crossLink "Constants (ODsC)"}}capability
- * list{{/crossLink}})
+ * @instance
+ * @memberof Dataset
+ * @param {string} capability {@link ODsC|capability list}
  * @return {boolean}
  */
 NAN_METHOD(Dataset::testCapability) {
@@ -257,6 +266,8 @@ NAN_METHOD(Dataset::testCapability) {
  * Get output projection for GCPs.
  *
  * @method getGCPProjection
+ * @instance
+ * @memberof Dataset
  * @return {string}
  */
 NAN_METHOD(Dataset::getGCPProjection) {
@@ -289,6 +300,8 @@ NAN_METHOD(Dataset::getGCPProjection) {
  * flush[Async]() ensures that, when writing, all data has been written.
  *
  * @method close
+ * @instance
+ * @memberof Dataset
  */
 NAN_METHOD(Dataset::close) {
   Dataset *ds = Nan::ObjectWrap::Unwrap<Dataset>(info.This());
@@ -308,6 +321,8 @@ NAN_METHOD(Dataset::close) {
  *
  * @throws Error
  * @method flush
+ * @instance
+ * @memberof Dataset
  */
 
 /**
@@ -315,6 +330,8 @@ NAN_METHOD(Dataset::close) {
  * {{{async}}}
  *
  * @method flushAsync
+ * @instance
+ * @memberof Dataset
  * @throws Error
  * @param {callback<void>} [callback=undefined] {{{cb}}}
  * @return {Promise<void>}
@@ -327,7 +344,7 @@ GDAL_ASYNCABLE_DEFINE(Dataset::flush) {
     raw->FlushCache();
     return 0;
   };
-  job.rval = [](int, GetFromPersistentFunc) { return Nan::Undefined().As<Value>(); };
+  job.rval = [](int, const GetFromPersistentFunc &) { return Nan::Undefined().As<Value>(); };
   job.run(info, async, 0);
 
   return;
@@ -338,15 +355,17 @@ GDAL_ASYNCABLE_DEFINE(Dataset::flush) {
  *
  * @throws Error
  * @method executeSQL
+ * @instance
+ * @memberof Dataset
  * @param {string} statement SQL statement to execute.
- * @param {gdal.Geometry} [spatial_filter=null] Geometry which represents a
+ * @param {Geometry} [spatial_filter=null] Geometry which represents a
  * spatial filter.
  * @param {string} [dialect=null] Allows control of the statement dialect. If
  * set to `null`, the OGR SQL engine will be used, except for RDBMS drivers that
  * will use their dedicated SQL engine, unless `"OGRSQL"` is explicitely passed
  * as the dialect. Starting with OGR 1.10, the `"SQLITE"` dialect can also be
  * used.
- * @return {gdal.Layer}
+ * @return {Layer}
  */
 
 /**
@@ -355,16 +374,18 @@ GDAL_ASYNCABLE_DEFINE(Dataset::flush) {
  *
  * @throws Error
  * @method executeSQLAsync
+ * @instance
+ * @memberof Dataset
  * @param {string} statement SQL statement to execute.
- * @param {gdal.Geometry} [spatial_filter=null] Geometry which represents a
+ * @param {Geometry} [spatial_filter=null] Geometry which represents a
  * spatial filter.
  * @param {string} [dialect=null] Allows control of the statement dialect. If
  * set to `null`, the OGR SQL engine will be used, except for RDBMS drivers that
  * will use their dedicated SQL engine, unless `"OGRSQL"` is explicitely passed
  * as the dialect. Starting with OGR 1.10, the `"SQLITE"` dialect can also be
  * used.
- * @param {callback<gdal.Layer>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Layer>}
+ * @param {callback<Layer>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Layer>}
  */
 GDAL_ASYNCABLE_DEFINE(Dataset::executeSQL) {
   Dataset *ds = Nan::ObjectWrap::Unwrap<Dataset>(info.This());
@@ -392,7 +413,7 @@ GDAL_ASYNCABLE_DEFINE(Dataset::executeSQL) {
     if (layer == nullptr) throw CPLGetLastErrorMsg();
     return layer;
   };
-  job.rval = [raw](OGRLayer *layer, GetFromPersistentFunc) { return Layer::New(layer, raw, true); };
+  job.rval = [raw](OGRLayer *layer, const GetFromPersistentFunc &) { return Layer::New(layer, raw, true); };
 
   job.run(info, async, 3);
 }
@@ -407,6 +428,8 @@ GDAL_ASYNCABLE_DEFINE(Dataset::executeSQL) {
  * Returns an empty array for vector datasets if GDAL version is below 2.0
  *
  * @method getFileList
+ * @instance
+ * @memberof Dataset
  * @return {string[]}
  */
 NAN_METHOD(Dataset::getFileList) {
@@ -447,6 +470,8 @@ NAN_METHOD(Dataset::getFileList) {
  * Fetches GCPs.
  *
  * @method getGCPs
+ * @instance
+ * @memberof Dataset
  * @return {any[]}
  */
 NAN_METHOD(Dataset::getGCPs) {
@@ -495,6 +520,8 @@ NAN_METHOD(Dataset::getGCPs) {
  *
  * @throws Error
  * @method setGCPs
+ * @instance
+ * @memberof Dataset
  * @param {object[]} gcps
  * @param {string} [projection]
  */
@@ -559,6 +586,8 @@ NAN_METHOD(Dataset::setGCPs) {
  *
  * @throws Error
  * @method buildOverviews
+ * @instance
+ * @memberof Dataset
  * @param {string} resampling `"NEAREST"`, `"GAUSS"`, `"CUBIC"`, `"AVERAGE"`,
  * `"MODE"`, `"AVERAGE_MAGPHASE"` or `"NONE"`
  * @param {number[]} overviews
@@ -573,6 +602,8 @@ NAN_METHOD(Dataset::setGCPs) {
  *
  * @throws Error
  * @method buildOverviewsAsync
+ * @instance
+ * @memberof Dataset
  * @param {string} resampling `"NEAREST"`, `"GAUSS"`, `"CUBIC"`, `"AVERAGE"`,
  * `"MODE"`, `"AVERAGE_MAGPHASE"` or `"NONE"`
  * @param {number[]} overviews
@@ -650,14 +681,17 @@ GDAL_ASYNCABLE_DEFINE(Dataset::buildOverviews) {
     if (err != CE_None) { throw CPLGetLastErrorMsg(); }
     return err;
   };
-  job.rval = [](CPLErr, GetFromPersistentFunc) { return Nan::Undefined().As<Value>(); };
+  job.rval = [](CPLErr, const GetFromPersistentFunc &) { return Nan::Undefined().As<Value>(); };
 
   job.run(info, async, 4);
 }
 
 /**
- * @readOnly
- * @attribute description
+ * @readonly
+ * @kind member
+ * @name description
+ * @instance
+ * @memberof Dataset
  * @type {string}
  */
 NAN_GETTER(Dataset::descriptionGetter) {
@@ -680,8 +714,11 @@ NAN_GETTER(Dataset::descriptionGetter) {
 /**
  * Raster dimensions. An object containing `x` and `y` properties.
  *
- * @readOnly
- * @attribute rasterSize
+ * @readonly
+ * @kind member
+ * @name rasterSize
+ * @instance
+ * @memberof Dataset
  * @type {xyz}
  */
 
@@ -689,8 +726,11 @@ NAN_GETTER(Dataset::descriptionGetter) {
  * Raster dimensions. An object containing `x` and `y` properties.
  * {{async_getter}}
  *
- * @readOnly
- * @attribute rasterSizeAsync
+ * @readonly
+ * @kind member
+ * @name rasterSizeAsync
+ * @instance
+ * @memberof Dataset
  * @type {Promise<xyz>}
  */
 GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::rasterSizeGetter) {
@@ -724,7 +764,7 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::rasterSizeGetter) {
     return result;
   };
 
-  job.rval = [](xy xy, GetFromPersistentFunc) {
+  job.rval = [](xy xy, const GetFromPersistentFunc &) {
     Nan::EscapableHandleScope scope;
     if (xy.null) return Nan::Null().As<Value>();
     Local<Object> result = Nan::New<Object>();
@@ -740,8 +780,11 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::rasterSizeGetter) {
  * Spatial reference associated with raster dataset
  *
  * @throws Error
- * @attribute srs
- * @type {gdal.SpatialReference}
+ * @kind member
+ * @name srs
+ * @instance
+ * @memberof Dataset
+ * @type {SpatialReference|null}
  */
 
 /**
@@ -749,9 +792,12 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::rasterSizeGetter) {
  * {{async_getter}}
  *
  * @throws Error
- * @attribute srsAsync
- * @readOnly
- * @type {Promise<gdal.SpatialReference>}
+ * @kind member
+ * @name srsAsync
+ * @instance
+ * @memberof Dataset
+ * @readonly
+ * @type {Promise<SpatialReference|null>}
  */
 GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::srsGetter) {
   Dataset *ds = Nan::ObjectWrap::Unwrap<Dataset>(info.This());
@@ -779,7 +825,7 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::srsGetter) {
     return srs;
   };
 
-  job.rval = [](OGRSpatialReference *srs, GetFromPersistentFunc) {
+  job.rval = [](OGRSpatialReference *srs, const GetFromPersistentFunc &) {
     if (srs != nullptr)
       return SpatialReference::New(srs, true);
     else
@@ -793,13 +839,16 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::srsGetter) {
  * space using the following relationship:
  *
  * @example
- * ```
+ *
  * var GT = dataset.geoTransform;
  * var Xgeo = GT[0] + Xpixel*GT[1] + Yline*GT[2];
- * var Ygeo = GT[3] + Xpixel*GT[4] + Yline*GT[5];```
+ * var Ygeo = GT[3] + Xpixel*GT[4] + Yline*GT[5];
  *
- * @attribute geoTransform
- * @type {number[]}
+ * @kind member
+ * @name geoTransform
+ * @instance
+ * @memberof Dataset
+ * @type {number[]|null}
  */
 
 /**
@@ -807,15 +856,18 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::srsGetter) {
  * space using the following relationship:
  *
  * @example
- * ```
+ *
  * var GT = dataset.geoTransform;
  * var Xgeo = GT[0] + Xpixel*GT[1] + Yline*GT[2];
- * var Ygeo = GT[3] + Xpixel*GT[4] + Yline*GT[5];```
+ * var Ygeo = GT[3] + Xpixel*GT[4] + Yline*GT[5];
  *
  * {{async_getter}}
- * @readOnly
- * @attribute geoTransformAsync
- * @type {Promise<number[]>}
+ * @readonly
+ * @kind member
+ * @name geoTransformAsync
+ * @instance
+ * @memberof Dataset
+ * @type {Promise<number[]|null>}
  */
 GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::geoTransformGetter) {
   Dataset *ds = Nan::ObjectWrap::Unwrap<Dataset>(info.This());
@@ -837,7 +889,7 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::geoTransformGetter) {
     return transform;
   };
 
-  job.rval = [](std::shared_ptr<double> transform, GetFromPersistentFunc) {
+  job.rval = [](std::shared_ptr<double> transform, const GetFromPersistentFunc &) {
     if (transform == nullptr) return Nan::Null().As<v8::Value>();
     Local<Array> result = Nan::New<Array>(6);
     Nan::Set(result, 0, Nan::New<Number>(transform.get()[0]));
@@ -854,9 +906,12 @@ GDAL_ASYNCABLE_GETTER_DEFINE(Dataset::geoTransformGetter) {
 }
 
 /**
- * @readOnly
- * @attribute driver
- * @type {gdal.Driver}
+ * @readonly
+ * @kind member
+ * @name driver
+ * @instance
+ * @memberof Dataset
+ * @type {Driver}
  */
 NAN_GETTER(Dataset::driverGetter) {
   Dataset *ds = Nan::ObjectWrap::Unwrap<Dataset>(info.This());
@@ -942,27 +997,36 @@ NAN_SETTER(Dataset::geoTransformSetter) {
 }
 
 /**
- * @readOnly
- * @attribute bands
- * @type {gdal.DatasetBands}
+ * @readonly
+ * @kind member
+ * @name bands
+ * @instance
+ * @memberof Dataset
+ * @type {DatasetBands}
  */
 NAN_GETTER(Dataset::bandsGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("bands_").ToLocalChecked()).ToLocalChecked());
 }
 
 /**
- * @readOnly
- * @attribute layers
- * @type {gdal.DatasetLayers}
+ * @readonly
+ * @kind member
+ * @name layers
+ * @instance
+ * @memberof Dataset
+ * @type {DatasetLayers}
  */
 NAN_GETTER(Dataset::layersGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("layers_").ToLocalChecked()).ToLocalChecked());
 }
 
 /**
- * @readOnly
- * @attribute root
- * @type {gdal.Group}
+ * @readonly
+ * @kind member
+ * @name root
+ * @instance
+ * @memberof Dataset
+ * @type {Group}
  */
 NAN_GETTER(Dataset::rootGetter) {
   Local<Value> rootObj = Nan::GetPrivate(info.This(), Nan::New("root_").ToLocalChecked()).ToLocalChecked();

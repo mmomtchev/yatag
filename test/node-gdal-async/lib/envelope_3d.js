@@ -1,38 +1,20 @@
 module.exports = function () {
   /**
-   * A 3D bounding box. For 2D envelopes, see {{#crossLink "gdal.Envelope"}}gdal.Envelope{{/crossLink}}.
+   * A 3D bounding box. For 2D envelopes, see {@link Envelope}
    *
    * (Pure-javascript implementation of [OGREnvelope3D](http://www.gdal.org/classOGREnvelope3D.html))
    *
    * @constructor
-   * @class gdal.Envelope3D
+   * @class Envelope3D
    * @param {object} [bounds] An object containing `minX`, `maxX`, `minY`, `maxY`, `minZ`, and `maxZ` values.
+   * @property {number} minX
+   * @property {number} maxX
+   * @property {number} minY
+   * @property {number} maxY
+   * @property {number} minZ
+   * @property {number} maxZ
    */
   const Envelope3D = module.exports = function Envelope3D(envelope) {
-  /**
-   * @property minX
-   * @type {number}
-   */
-    /**
-   * @property maxX
-   * @type {number}
-   */
-    /**
-   * @property minY
-   * @type {number}
-   */
-    /**
-   * @property maxY
-   * @type {number}
-   */
-    /**
-   * @property minZ
-   * @type {number}
-   */
-    /**
-   * @property maxZ
-   * @type {number}
-   */
     if (envelope) {
       this.minX = envelope.minX
       this.minY = envelope.minY
@@ -53,7 +35,8 @@ module.exports = function () {
   /**
    * Determines if the envelope has not been set yet.
    *
-   * @method isEmpty
+   * @function isEmpty
+   * @memberof Envelope3D
    * @return {boolean}
    */
   Envelope3D.prototype.isEmpty = function () {
@@ -70,7 +53,8 @@ module.exports = function () {
   /**
    * Unions the provided envelope with the current envelope.
    *
-   * @method merge
+   * @function merge
+   * @memberof Envelope3D
    * @param {Envelope3D} envelope
    * @return {void}
    */
@@ -78,7 +62,8 @@ module.exports = function () {
   /**
    * Unions the provided envelope with the x/y/z coordinates provided.
    *
-   * @method merge
+   * @function merge
+   * @memberof Envelope3D
    * @param {number} x
    * @param {number} y
    * @param {number} z
@@ -123,7 +108,8 @@ module.exports = function () {
   /**
    * Determines if the provided envelope touches it.
    *
-   * @method intersects
+   * @function intersects
+   * @memberof Envelope3D
    * @param {Envelope3D} envelope
    * @return {boolean}
    */
@@ -141,7 +127,8 @@ module.exports = function () {
   /**
    * Updates the envelope to the intersection of the two envelopes.
    *
-   * @method intersect
+   * @function intersect
+   * @memberof Envelope3D
    * @param {Envelope3D} envelope
    * @return {void}
    */
@@ -170,7 +157,8 @@ module.exports = function () {
   /**
    * Determines if the provided envelope is wholly-contained by the current envelope.
    *
-   * @method contains
+   * @function contains
+   * @memberof Envelope3D
    * @param {Envelope3D} envelope
    * @return {boolean}
    */

@@ -1,30 +1,18 @@
 module.exports = function (gdal) {
   /**
-   * A 2D bounding box. For 3D envelopes, see {{#crossLink "gdal.Envelope3D"}}gdal.Envelope3D{{/crossLink}}.
+   * A 2D bounding box. For 3D envelopes, see {@link Envelope3D}
    *
    * (Pure-javascript implementation of [OGREnvelope](https://gdal.org/doxygen/classOGREnvelope.html))
    *
    * @constructor
-   * @class gdal.Envelope
+   * @class Envelope
    * @param {object} [bounds] An object containing `minX`, `maxX`, `minY`, and `maxY` values.
+   * @property {number} minX
+   * @property {number} maxX
+   * @property {number} minY
+   * @property {number} maxY
    */
   const Envelope = function Envelope(envelope) {
-  /**
-   * @property minX
-   * @type {number}
-   */
-    /**
-   * @property maxX
-   * @type {number}
-   */
-    /**
-   * @property minY
-   * @type {number}
-   */
-    /**
-   * @property maxY
-   * @type {number}
-   */
     if (envelope) {
       this.minX = envelope.minX
       this.minY = envelope.minY
@@ -41,7 +29,8 @@ module.exports = function (gdal) {
   /**
    * Determines if the envelope has not been set yet.
    *
-   * @method isEmpty
+   * @function isEmpty
+   * @memberof Envelope
    * @return {boolean}
    */
   Envelope.prototype.isEmpty = function () {
@@ -51,7 +40,8 @@ module.exports = function (gdal) {
   /**
    * Unions the provided envelope with the current envelope.
    *
-   * @method merge
+   * @function merge
+   * @memberof Envelope
    * @param {Envelope} envelope
    * @return {void}
    */
@@ -59,7 +49,8 @@ module.exports = function (gdal) {
   /**
    * Unions the provided envelope with the x/y coordinates provided.
    *
-   * @method merge
+   * @function merge
+   * @memberof Envelope
    * @param {number} x
    * @param {number} y
    * @return {void}
@@ -95,7 +86,8 @@ module.exports = function (gdal) {
   /**
    * Determines if the provided envelope touches it.
    *
-   * @method intersects
+   * @function intersects
+   * @memberof Envelope
    * @param {Envelope} envelope
    * @return {boolean}
    */
@@ -111,7 +103,8 @@ module.exports = function (gdal) {
   /**
    * Updates the envelope to the intersection of the two envelopes.
    *
-   * @method intersect
+   * @function intersect
+   * @memberof Envelope
    * @param {Envelope} envelope
    * @return {void}
    */
@@ -136,7 +129,8 @@ module.exports = function (gdal) {
   /**
    * Determines if the provided envelope is wholly-contained by the current envelope.
    *
-   * @method contains
+   * @function contains
+   * @memberof Envelope
    * @param {Envelope} envelope
    * @return {boolean}
    */
@@ -152,7 +146,8 @@ module.exports = function (gdal) {
   /**
    * Converts the envelope to a polygon.
    *
-   * @method toPolygon
+   * @function toPolygon
+   * @memberof Envelope
    * @return {Polygon}
    */
   Envelope.prototype.toPolygon = function () {

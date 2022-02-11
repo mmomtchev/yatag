@@ -21,6 +21,11 @@ void Utils::Initialize(Local<Object> target) {
 }
 
 /**
+ * @typedef {object} UtilOptions
+ * @property {ProgressCb} [progress_cb]
+ */
+
+/**
  * Library version of gdal_translate.
  *
  * @example
@@ -29,14 +34,14 @@ void Utils::Initialize(Local<Object> target) {
  *
  * @throws Error
  * @method translate
- * @for gdal
+ * @instance
  * @static
  * @param {string} destination destination filename
- * @param {gdal.Dataset} source source dataset
+ * @param {Dataset} source source dataset
  * @param {string[]} [args] array of CLI options for gdal_translate
  * @param {UtilOptions} [options] additional options
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
- * @return {gdal.Dataset}
+ * @return {Dataset}
  */
 
 /**
@@ -49,15 +54,15 @@ void Utils::Initialize(Local<Object> target) {
  * @throws Error
  *
  * @method translateAsync
- * @for gdal
+ * @instance
  * @static
  * @param {string} destination destination filename
- * @param {gdal.Dataset} source source dataset
+ * @param {Dataset} source source dataset
  * @param {string[]} [args] array of CLI options for gdal_translate
  * @param {UtilOptions} [options] additional options
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
- * @param {callback<void>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Dataset>}
+ * @param {callback<Dataset>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Dataset>}
  */
 GDAL_ASYNCABLE_DEFINE(Utils::translate) {
   auto aosOptions = std::make_shared<CPLStringList>();
@@ -95,7 +100,7 @@ GDAL_ASYNCABLE_DEFINE(Utils::translate) {
     if (r == nullptr) throw CPLGetLastErrorMsg();
     return r;
   };
-  job.rval = [](GDALDataset *ds, GetFromPersistentFunc) { return Dataset::New(ds); };
+  job.rval = [](GDALDataset *ds, const GetFromPersistentFunc &) { return Dataset::New(ds); };
 
   job.run(info, async, 4);
 }
@@ -109,14 +114,14 @@ GDAL_ASYNCABLE_DEFINE(Utils::translate) {
  *
  * @throws Error
  * @method vectorTranslate
- * @for gdal
+ * @instance
  * @static
- * @param {string|gdal.Dataset} destination destination
- * @param {gdal.Dataset} source source dataset
+ * @param {string|Dataset} destination destination
+ * @param {Dataset} source source dataset
  * @param {string[]} [args] array of CLI options for ogr2ogr
  * @param {UtilOptions} [options] additional options
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
- * @return {gdal.Dataset}
+ * @return {Dataset}
  */
 
 /**
@@ -129,15 +134,15 @@ GDAL_ASYNCABLE_DEFINE(Utils::translate) {
  * @throws Error
  *
  * @method vectorTranslateAsync
- * @for gdal
+ * @instance
  * @static
- * @param {string|gdal.Dataset} destination destination
- * @param {gdal.Dataset} source source dataset
+ * @param {string|Dataset} destination destination
+ * @param {Dataset} source source dataset
  * @param {string[]} [args] array of CLI options for ogr2ogr
  * @param {UtilOptions} [options] additional options
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
- * @param {callback<void>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Dataset>}
+ * @param {callback<Dataset>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Dataset>}
  */
 GDAL_ASYNCABLE_DEFINE(Utils::vectorTranslate) {
   auto aosOptions = std::make_shared<CPLStringList>();
@@ -199,7 +204,7 @@ GDAL_ASYNCABLE_DEFINE(Utils::vectorTranslate) {
     if (r == nullptr) throw CPLGetLastErrorMsg();
     return r;
   };
-  job.rval = [](GDALDataset *ds, GetFromPersistentFunc) { return Dataset::New(ds); };
+  job.rval = [](GDALDataset *ds, const GetFromPersistentFunc &) { return Dataset::New(ds); };
 
   job.run(info, async, 4);
 }
@@ -213,9 +218,9 @@ GDAL_ASYNCABLE_DEFINE(Utils::vectorTranslate) {
  *
  * @throws Error
  * @method info
- * @for gdal
+ * @instance
  * @static
- * @param {gdal.Dataset} dataset
+ * @param {Dataset} dataset
  * @param {string[]} [args] array of CLI options for gdalinfo
  * @return {string}
  */
@@ -230,11 +235,11 @@ GDAL_ASYNCABLE_DEFINE(Utils::vectorTranslate) {
  * @throws Error
  *
  * @method infoAsync
- * @for gdal
+ * @instance
  * @static
- * @param {gdal.Dataset} dataset
+ * @param {Dataset} dataset
  * @param {string[]} [args] array of CLI options for gdalinfo
- * @param {callback<void>} [callback=undefined] {{{cb}}}
+ * @param {callback<string>} [callback=undefined] {{{cb}}}
  * @return {Promise<string>}
  */
 GDAL_ASYNCABLE_DEFINE(Utils::info) {
@@ -264,7 +269,7 @@ GDAL_ASYNCABLE_DEFINE(Utils::info) {
     CPLFree(r);
     return s;
   };
-  job.rval = [](std::string s, GetFromPersistentFunc) { return SafeString::New(s.c_str()); };
+  job.rval = [](std::string s, const GetFromPersistentFunc &) { return SafeString::New(s.c_str()); };
 
   job.run(info, async, 2);
 }
@@ -278,15 +283,15 @@ GDAL_ASYNCABLE_DEFINE(Utils::info) {
  *
  * @throws Error
  * @method warp
- * @for gdal
+ * @instance
  * @static
- * @param {string} [dst_path] destination path, null for an in-memory operation
- * @param {gdal.Dataset} [dst_ds] destination dataset, null for a new dataset
- * @param {gdal.Dataset[]} src_ds array of source datasets
+ * @param {string|null} dst_path destination path, null for an in-memory operation
+ * @param {Dataset|null} dst_ds destination dataset, null for a new dataset
+ * @param {Dataset[]} src_ds array of source datasets
  * @param {string[]} [args] array of CLI options for gdalwarp
  * @param {UtilOptions} [options] additional options
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
- * @return {gdal.Dataset}
+ * @return {Dataset}
  */
 
 /**
@@ -299,16 +304,16 @@ GDAL_ASYNCABLE_DEFINE(Utils::info) {
  * @throws Error
  *
  * @method warpAsync
- * @for gdal
+ * @instance
  * @static
- * @param {string} [dst_path] destination path, null for an in-memory operation
- * @param {gdal.Dataset} [dst_ds] destination dataset, null for a new dataset
- * @param {gdal.Dataset[]} src_ds array of source datasets
+ * @param {string|null} dst_path destination path, null for an in-memory operation
+ * @param {Dataset|null} dst_ds destination dataset, null for a new dataset
+ * @param {Dataset[]} src_ds array of source datasets
  * @param {string[]} [args] array of CLI options for gdalwarp
  * @param {UtilOptions} [options] additional options
  * @param {ProgressCb} [options.progress_cb] {{{progress_cb}}}
- * @param {callback<void>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Dataset>}
+ * @param {callback<Dataset>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Dataset>}
  */
 GDAL_ASYNCABLE_DEFINE(Utils::warp) {
   auto aosOptions = std::make_shared<CPLStringList>();
@@ -379,7 +384,7 @@ GDAL_ASYNCABLE_DEFINE(Utils::warp) {
       if (r == nullptr) throw CPLGetLastErrorMsg();
       return GDALDatasetFromHandle(r);
     };
-  job.rval = [](GDALDataset *ds, GetFromPersistentFunc) { return Dataset::New(ds); };
+  job.rval = [](GDALDataset *ds, const GetFromPersistentFunc &) { return Dataset::New(ds); };
 
   job.run(info, async, 5);
 }

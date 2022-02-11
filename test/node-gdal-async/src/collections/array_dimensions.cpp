@@ -46,21 +46,23 @@ int ArrayDimensions::__count(std::shared_ptr<GDALMDArray> parent) {
 }
 
 /**
- * An encapsulation of a {{#crossLink "gdal.Group"}}Group{{/crossLink}}'s
+ * An encapsulation of a {@link MDArray}
  * descendant dimensions.
  *
- * ```
- * const dimensions = group.dimensions;```
+ * @example
+ * const dimensions = group.dimensions;
  *
- * @class gdal.ArrayDimensions
+ * @class ArrayDimensions
  */
 
 /**
  * Returns the array with the given name/index.
  *
  * @method get
+ * @instance
+ * @memberof ArrayDimensions
  * @param {string|number} array
- * @return {gdal.Dimension}
+ * @return {Dimension}
  */
 
 /**
@@ -68,17 +70,20 @@ int ArrayDimensions::__count(std::shared_ptr<GDALMDArray> parent) {
  * {{{async}}}
  *
  * @method getAsync
- *
+ * @instance
+ * @memberof ArrayDimensions
  * @param {string|number} array
- * @param {callback<gdal.Dimension>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.Dimension>}
+ * @param {callback<Dimension>} [callback=undefined] {{{cb}}}
+ * @return {Promise<Dimension>}
  */
 
 /**
  * Returns the number of dimensions in the collection.
  *
  * @method count
- * @return {number}
+ * @instance
+ * @memberof ArrayDimensions
+* @return {number}
  */
 
 /**
@@ -86,31 +91,43 @@ int ArrayDimensions::__count(std::shared_ptr<GDALMDArray> parent) {
  * {{{async}}}
  *
  * @method countAsync
- *
+ * @instance
+ * @memberof ArrayDimensions
  * @param {callback<number>} [callback=undefined] {{{cb}}}
  * @return {Promise<number>}
  */
 
 /**
- * @readOnly
- * @attribute names
+ * Dimensions' names
+ *
+ * @readonly
+ * @kind member
+ * @instance
+ * @memberof ArrayDimensions
+ * @name names
  * @type {string[]}
  */
 
 /**
  * Parent group
  *
- * @readOnly
- * @attribute ds
- * @type {gdal.Group}
+ * @readonly
+ * @kind member
+ * @instance
+ * @memberof ArrayDimensions
+ * @name parent
+ * @type {Group}
  */
 
 /**
  * Parent dataset
  *
- * @readOnly
- * @attribute ds
- * @type {gdal.Dataset}
+ * @readonly
+ * @kind member
+ * @instance
+ * @memberof ArrayDimensions
+ * @name ds
+ * @type {Dataset}
  */
 #endif
 

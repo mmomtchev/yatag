@@ -31,18 +31,17 @@ void LineString::Initialize(Local<Object> target) {
  * Concrete representation of a multi-vertex line.
  *
  * @example
- * ```
+ *
  * var lineString = new gdal.LineString();
  * lineString.points.add(new gdal.Point(0,0));
- * lineString.points.add(new gdal.Point(0,10));```
+ * lineString.points.add(new gdal.Point(0,10));
  *
  * @constructor
- * @class gdal.LineString
- * @extends gdal.SimpleCurve
+ * @class LineString
+ * @extends SimpleCurve
  */
 
 NAN_METHOD(LineString::toString) {
-  Nan::HandleScope scope;
   info.GetReturnValue().Set(Nan::New("LineString").ToLocalChecked());
 }
 

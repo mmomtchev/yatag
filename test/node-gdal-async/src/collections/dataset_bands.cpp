@@ -35,13 +35,13 @@ DatasetBands::~DatasetBands() {
 }
 
 /**
- * An encapsulation of a {{#crossLink "gdal.Dataset"}}Dataset{{/crossLink}}'s
+ * An encapsulation of a {@link Dataset}
  * raster bands.
  *
- * ```
- * var bands = dataset.bands;```
+ * @example
+ * var bands = dataset.bands;
  *
- * @class gdal.DatasetBands
+ * @class DatasetBands
  */
 NAN_METHOD(DatasetBands::New) {
 
@@ -83,9 +83,11 @@ NAN_METHOD(DatasetBands::toString) {
  * Returns the band with the given ID.
  *
  * @method get
+ * @instance
+ * @memberof DatasetBands
  * @param {number} id
  * @throws Error
- * @return {gdal.RasterBand}
+ * @return {RasterBand}
  */
 
 /**
@@ -93,11 +95,13 @@ NAN_METHOD(DatasetBands::toString) {
  * {{{async}}}
  *
  * @method getAsync
+ * @instance
+ * @memberof DatasetBands
  *
  * @param {number} id
- * @param {callback<gdal.RasterBand>} [callback=undefined] {{{cb}}}
+ * @param {callback<RasterBand>} [callback=undefined] {{{cb}}}
  * @throws Error
- * @return {Promise<gdal.RasterBand>}
+ * @return {Promise<RasterBand>}
  */
 GDAL_ASYNCABLE_DEFINE(DatasetBands::get) {
 
@@ -122,7 +126,7 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::get) {
     if (band == nullptr) { throw CPLGetLastErrorMsg(); }
     return band;
   };
-  job.rval = [raw](GDALRasterBand *band, GetFromPersistentFunc) { return RasterBand::New(band, raw); };
+  job.rval = [raw](GDALRasterBand *band, const GetFromPersistentFunc &) { return RasterBand::New(band, raw); };
   job.run(info, async, 1);
 }
 
@@ -130,10 +134,12 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::get) {
  * Adds a new band.
  *
  * @method create
+ * @instance
+ * @memberof DatasetBands
  * @throws Error
- * @param {string} dataType Type of band ({{#crossLink "Constants (GDT)"}}see GDT constants{{/crossLink}}).
+ * @param {string} dataType Type of band ({@link GDT|see GDT constants})
  * @param {object|string[]} [options] Creation options
- * @return {gdal.RasterBand}
+ * @return {RasterBand}
  */
 
 /**
@@ -141,11 +147,13 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::get) {
  * {{{async}}}
  *
  * @method createAsync
+ * @instance
+ * @memberof DatasetBands
  * @throws Error
- * @param {string} dataType Type of band ({{#crossLink "Constants (GDT)"}}see GDT constants{{/crossLink}}).
+ * @param {string} dataType Type of band ({@link GDT|see GDT constants})
  * @param {object|string[]} [options] Creation options
- * @param {callback<gdal.RasterBand>} [callback=undefined] {{{cb}}}
- * @return {Promise<gdal.RasterBand>}
+ * @param {callback<RasterBand>} [callback=undefined] {{{cb}}}
+ * @return {Promise<RasterBand>}
  */
 
 GDAL_ASYNCABLE_DEFINE(DatasetBands::create) {
@@ -190,7 +198,7 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::create) {
     if (err != CE_None) { throw CPLGetLastErrorMsg(); }
     return raw->GetRasterBand(raw->GetRasterCount());
   };
-  job.rval = [raw](GDALRasterBand *r, GetFromPersistentFunc) { return RasterBand::New(r, raw); };
+  job.rval = [raw](GDALRasterBand *r, const GetFromPersistentFunc &) { return RasterBand::New(r, raw); };
   job.run(info, async, 2);
 }
 
@@ -198,6 +206,8 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::create) {
  * Returns the number of bands.
  *
  * @method count
+ * @instance
+ * @memberof DatasetBands
  * @return {number}
  */
 
@@ -207,6 +217,8 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::create) {
  * {{{async}}}
  *
  * @method countAsync
+ * @instance
+ * @memberof DatasetBands
  *
  * @param {callback<number>} [callback=undefined] {{{cb}}}
  * @return {Promise<number>}
@@ -229,16 +241,19 @@ GDAL_ASYNCABLE_DEFINE(DatasetBands::count) {
     int count = raw->GetRasterCount();
     return count;
   };
-  job.rval = [](int count, GetFromPersistentFunc) { return Nan::New<Integer>(count); };
+  job.rval = [](int count, const GetFromPersistentFunc &) { return Nan::New<Integer>(count); };
   job.run(info, async, 0);
 }
 
 /**
  * Parent dataset
  *
- * @readOnly
- * @attribute ds
- * @type {gdal.Dataset}
+ * @readonly
+ * @kind member
+ * @name ds
+ * @instance
+ * @memberof DatasetBands
+ * @type {Dataset}
  */
 NAN_GETTER(DatasetBands::dsGetter) {
   info.GetReturnValue().Set(Nan::GetPrivate(info.This(), Nan::New("parent_").ToLocalChecked()).ToLocalChecked());
