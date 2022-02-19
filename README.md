@@ -4,16 +4,11 @@
 [![License: ISC](https://img.shields.io/github/license/mmomtchev/yatag)](https://github.com/mmomtchev/yatag/blob/master/LICENSE)
 [![npm version](https://img.shields.io/npm/v/yatag)](https://www.npmjs.com/package/yatag)
 [![Node.js CI](https://github.com/mmomtchev/yatag/workflows/Node.js%20CI/badge.svg)](https://github.com/mmomtchev/yatag/actions?query=workflow%3A%22Node.js+CI%22)
-
-## **[YMMV]**
-
-***This project is still not ready for general use. I use it to create TypeScript type annotations for most of my JS and especially my combined JS/C++ projects. I usually add the features I need at every new project. Maybe one day it will become a real generic tool.***
-
 # Yet Another Tag Annotations Generator
 
-yatag is a tool for generating TypeScript `index.d.ts` from jsdoc-compatible type annotations.
+`yatag` is a tool for generating TypeScript `index.d.ts` from jsdoc-compatible type annotations.
 
-It was created to generate the `index.d.ts` of the project `node-gdal-async` which is a native Node.js addon with both JS and C++ code. It is tested with `yuidoc` but should also support other jsdoc-compatible annotations.
+I created it to generate the `index.d.ts` of the project `node-gdal-async` which is a native Node.js addon with both JS and C++ code. Since then, I have used it for most of my JS projects. It is still not fully standards-compliant, but it should be usable as is.
 
 As opposed to the now built-in capability of the Typescript compiler, `yatag` solves a very simple problem in a very simple manner.
 
@@ -54,3 +49,11 @@ yatag
 ```
 
 Voila, you have generated your type definitions.
+
+If you need more complex examples, you can check those projects:
+
+* [node-gdal-async](https://github.com/mmomtchev/node-gdal-async) - I am actively developing the GDAL bindings for Node.js which used to be abandoned by its creator
+  - [ndarray-gdal](https://github.com/mmomtchev/ndarray-gdal) is the [scijs](https://github.com/scijs/ndarray) plugin
+  - [gdal-exprtk](https://github.com/mmomtchev/gdal-exprtk) is the [ExprTk.js](https://github.com/mmomtchev/exprtk.js) plugin
+* [geosub](https://github.com/mmomtchev/geosub) - A tool for partial downloading of bands and subwindows from geospatial raster datasets from cloud storage, it is an Amazon AWS-compatible replacement for NOAA's own [g2sub](https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl)
+* [Queue](https://github.com/mmomtchev/Queue) - is a rather simple but useful package for rate-limiting access to external APIs
