@@ -1,6 +1,7 @@
 export default class Queue {
 	/**
 	 * @class Queue
+	 * @exports export=Queue
 	 * 
 	 * Priority queue with rate limiting<br>
 	 * See the medium article:<br>
@@ -15,6 +16,7 @@ export default class Queue {
 		this.queueRunning = [];
 		this.queueWaiting = {};
 		this.lastRun = 0;
+		this.throttling = 0;
 	}
 
 	/** @private */
@@ -72,6 +74,7 @@ export default class Queue {
 
 		/* Are we allowed to run? */
 		if (this.queueRunning.length >= this.maxConcurrent) {
+			console.log(hash, 'waiting');
 			/* This promise will be unlocked from the outside */
 			/* and it cannot reject */
 			me.promise = new Promise((resolve) => {
@@ -81,6 +84,7 @@ export default class Queue {
 			this.queueWaiting[priority].push(me);
 			await me.promise;
 		}
+		console.log(hash, 'finished waiting');
 
 		this.queueRunning.push(me);
 		me.promise = new Promise((resolve) => {
@@ -88,9 +92,14 @@ export default class Queue {
 		});
 		/* Wait if it is too soon */
 		while (Date.now() - this.lastRun < this.minCycle) {
-			await new Promise((resolve) => setTimeout(resolve, this.minCycle - Date.now() + this.lastRun));
+			this.throttling++;
+			console.log(hash, 'will throttle', this.throttling, Date.now() % 1000, (this.minCycle * this.throttling + this.lastRun) % 1000);
+			await new Promise((resolve) => setTimeout(resolve, this.minCycle * this.throttling - Date.now() + this.lastRun));
+			console.log(hash, 'finished throttling', this.throttling, Date.now() % 1000);
+			this.throttling--;
 		}
 		this.lastRun = Date.now();
+		console.log(hash, 'will run');
 	}
 
 	/**
@@ -113,7 +122,7 @@ export default class Queue {
 	}
 
 	/**
-	 * @interface QueueStats {running: {number}, waiting: {number}, last: {number}}
+	 * @interface QueueStats {running: number, waiting: number, last: number}
 	 */
 
 	/**

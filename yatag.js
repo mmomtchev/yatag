@@ -189,6 +189,9 @@ for (const file of inputFiles) {
                             newElement.name = groups.name;
                     }
                     break;
+                case 'exports':
+                    root.exports = options;
+                    break;
                 default:
                     continue;
                 }
@@ -246,32 +249,32 @@ if (config.root && root.children[`class#${config.root}`]) {
 
 for (const typeName of Object.keys(root.children).filter((n) => n.startsWith('typedef#')).sort()) {
     const defn = root.children[typeName];
-    output.write(expandType(defn, `export type ${defn.name} = `));
+    output.write(expandType(defn, `${root.exports ? 'declare' : 'export'} type ${defn.name} = `));
 }
 
 for (const ifName of Object.keys(root.children).filter((n) => n.startsWith('interface#')).sort()) {
     const defn = root.children[ifName];
-    output.write(expandType(defn, `export interface ${defn.name}${defn.extends ? ` extends ${defn.extends}` : ''} `));
+    output.write(expandType(defn, `${root.exports ? 'declare' : 'export'} interface ${defn.name}${defn.extends ? ` extends ${defn.extends}` : ''} `));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('property#')).sort()) {
     const defn = root.children[name];
-    const prefix = defn.readonly ? 'export const ' : 'export let ';
+    const prefix = defn.readonly ? `${root.exports ? 'declare' : 'export'} const ` : `${root.exports ? 'declare' : 'export'} let `;
     output.write(expandProperty(defn, prefix));
 }
 
 for (const name of Object.keys(root.children).filter((n) => n.startsWith('method#')).sort()) {
     const defn = root.children[name];
-    output.write(expandMethod(defn, 'export function '));
+    output.write(expandMethod(defn, `${root.exports ? 'declare' : 'export'} function `));
 }
 
 for (const className of Object.keys(root.children).filter((n) => n.startsWith('class#')).sort()) {
     const klass = root.children[className];
     if (klass.context === 'class') {
         if (!config.augmentation)
-            output.write(`export class ${klass.name}`);
+            output.write(`${root.exports ? 'declare' : 'export'} class ${klass.name}`);
         else
-            output.write(`export interface ${klass.name}`);
+            output.write(`${root.exports ? 'declare' : 'export'} interface ${klass.name}`);
         if (klass.extends)
             output.write(` extends ${klass.extends}`);
         if (klass.children['iterator#'] || klass.children['asyncIterator#']) {
@@ -305,6 +308,10 @@ for (const className of Object.keys(root.children).filter((n) => n.startsWith('c
 
 if (config.augmentation) {
     output.write('}\n');
+}
+
+if (root.exports) {
+    output.write(root.exports);
 }
 
 if (config.footer) {

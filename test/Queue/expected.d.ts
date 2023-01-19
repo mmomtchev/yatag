@@ -1,8 +1,9 @@
-export interface QueueStats {running: {number}, waiting: {number}, last: {number}}
+declare interface QueueStats {running: number, waiting: number, last: number}
 
-export class Queue {
+declare class Queue {
 /**
 	 * @class Queue
+	 * @exports export=Queue
 	 * 
 	 * Priority queue with rate limiting<br>
 	 * See the medium article:<br>
@@ -60,5 +61,4 @@ export class Queue {
   flush(): Promise<void>
 }
 
-export default Queue;
-
+export=Queue
