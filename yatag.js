@@ -88,7 +88,7 @@ for (const file of inputFiles) {
             let groups, type, name;
             let defValue = false;
             if (options) {
-                groups = options.match(/(\{(?<type>[^}]+)\})?\s*?((?<name>[^\s{}]+)\s*((?<description>.*))?)?$/).groups;
+                groups = options.match(/(\{(?<type>[^}]+)\})?\s*?((?<name>[^\s^<^>{}]+(<.*>)?)\s*((?<description>.*))?)?$/).groups;
                 if (config.filter && options && groups.name && !config.filter(groups.name))
                     continue;
                 name = mangle(groups.name);

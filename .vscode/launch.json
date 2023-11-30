@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "name": "Launch node-gdal-async",
             "cwd": "${workspaceFolder}/test/node-gdal-async/",
@@ -16,7 +16,7 @@
             "program": "${workspaceFolder}/yatag.js"
         },
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "name": "Launch ndarray-gdal",
             "cwd": "${workspaceFolder}/test/ndarray-gdal/",
@@ -27,7 +27,7 @@
             "program": "${workspaceFolder}/yatag.js"
         },
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "name": "Launch Queue",
             "cwd": "${workspaceFolder}/test/Queue/",
