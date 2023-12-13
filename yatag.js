@@ -62,7 +62,7 @@ if (process.argv.includes('-v')) {
 const root = { context: 'module', name: config.root, children: {} };
 let inputFiles = [];
 for (const pattern of config.include) {
-    inputFiles = inputFiles.concat(glob.sync(pattern));
+    inputFiles = inputFiles.concat(glob.globSync(pattern).sort());
 }
 
 if (config.header) {
