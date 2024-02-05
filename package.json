@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/mmomtchev/yatag#readme",
   "dependencies": {
-    "glob": "^9.3.5"
+    "glob": "^10.3.10"
   },
   "devDependencies": {
     "eslint": "^7.32.0"
